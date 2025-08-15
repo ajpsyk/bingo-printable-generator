@@ -18,7 +18,9 @@ repositories {
 
 dependencies {
     // This dependency is used by the application.
-    implementation(libs.guava)
+    implementation(libs.itextKernel)
+    implementation(libs.itextIO)
+    implementation(libs.itextSVG)
 }
 
 testing {

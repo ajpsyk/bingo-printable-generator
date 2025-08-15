@@ -3,12 +3,17 @@
  */
 package org.bingo;
 
+import org.bingo.boundary.BingoCardGenerator;
+
+import java.io.IOException;
+
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        try {
+            BingoCardGenerator.main(args);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

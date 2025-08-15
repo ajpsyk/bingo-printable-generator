@@ -2,7 +2,9 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-guava = "33.4.5-jre"
+itext = "9.2.0"
 
 [libraries]
-guava = { module = "com.google.guava:guava", version.ref = "guava" }
+itextKernel = {module = "com.itextpdf:kernel", version.ref = "itext"}
+itextIO = {module = "com.itextpdf:io", version.ref = "itext"}
+itextSVG = {module = "com.itextpdf:svg", version.ref = "itext"}
