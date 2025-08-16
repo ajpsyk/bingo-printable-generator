@@ -25,3 +25,7 @@ gradle-app.setting
 
 # Ignore Gradle build output directory
 build
+
+# Temporary Asset Files
+resources
+output
