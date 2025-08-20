@@ -3,7 +3,7 @@
  */
 package org.bingo;
 
-import org.bingo.boundary.BingoCardGenerator;
+import org.bingo.generators.BingoCardGenerator;
 
 import java.io.IOException;
 
@@ -11,7 +11,7 @@ public class App {
 
     public static void main(String[] args) {
         try {
-            BingoCardGenerator.main(args);
+            BingoCardGenerator.generateOnePerPageFormat();
         } catch (IOException e) {
             e.printStackTrace();
         }
