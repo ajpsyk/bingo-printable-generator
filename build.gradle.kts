@@ -21,6 +21,7 @@ dependencies {
     implementation(libs.itextKernel)
     implementation(libs.itextIO)
     implementation(libs.itextSVG)
+    implementation(libs.lombok)
 }
 
 testing {
