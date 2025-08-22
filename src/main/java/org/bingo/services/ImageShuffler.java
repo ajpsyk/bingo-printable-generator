@@ -1,4 +1,4 @@
-package org.bingo.model;
+package org.bingo.services;
 
 import java.util.List;
 import java.util.Set;

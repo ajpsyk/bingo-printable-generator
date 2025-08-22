@@ -16,14 +16,12 @@ public class CardConfig {
     private float headerSpacingBottomInches;
     private float headerSpacingLeftInches;
 
-    private float gridMarginRightInches;
-    private float gridMarginBottomInches;
-    private float gridMarginLeftInches;
+    private float gridSpacingRightInches;
+    private float gridSpacingBottomInches;
+    private float gridSpacingLeftInches;
 
-    private float cellSpacingTopInches;
-    private float cellSpacingRightInches;
-    private float gridCellSpacingBottomInches;
-    private float gridCellSpacingLeftInches;
+    private float cellSpacingXRatio;
+    private float cellSpacingYRatio;
 
     private int cardAmount;
     private int docAmount;

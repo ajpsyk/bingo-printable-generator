@@ -3,15 +3,79 @@
  */
 package org.bingo;
 
-import org.bingo.generators.BingoCardGenerator;
+import org.bingo.services.DocumentBuilder;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.bingo.model.DocumentConfig;
+import org.bingo.model.CardConfig;
 
 public class App {
 
     public static void main(String[] args) {
         try {
-            BingoCardGenerator.generateOnePerPageFormat();
+
+            Path output = Paths.get("output");
+            Path resources = Paths.get("resources");
+            Path icons = resources.resolve("icons");
+            Path header = resources.resolve("Fall Nature Bingo Header.svg");
+            Path frame = resources.resolve("Fall Nature Frame.svg");
+            Path freeSpace = resources.resolve("Free Space.svg");
+            Path callingCardHeader = resources.resolve("Fall Nature Calling Cards Header.svg");
+            Path token = resources.resolve("Token.svg");
+            Path instructions = resources.resolve("How To Play.pdf");
+            Path font = resources.resolve("Dekko-Regular.ttf");
+            Path scissorsIcon = resources.resolve("Scissors.png");
+            Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve("FallNature_1PerPage.pdf");
+            Path TWO_PER_PAGE_OUTPUT_FILE = output.resolve("FallNature_2PerPage.pdf");
+            Path CALLING_CARDS_TOKES_RULES_OUTPUT_FILE = output.resolve(
+                    "FallNature_CallingCards, Tokens, & Rules.pdf"
+            );
+
+            DocumentConfig documentConfig = new DocumentConfig(
+                    "Fall Nature",
+                    icons,
+                    header,
+                    frame,
+                    freeSpace,
+                    callingCardHeader,
+                    token,
+                    instructions,
+                    font,
+                    scissorsIcon,
+                    ONE_PER_PAGE_OUTPUT_FILE,
+                    0.3f,
+                    0.3f,
+                    0.3f,
+                    0.3f
+            );
+
+            CardConfig bingoCardConfig = new CardConfig(
+                    "#ffffff",
+                    "#ffffff",
+                    0.023f,
+                    0.2f,
+                    0.4f,
+                    0.25f,
+                    0.4f,
+                    0.45f,
+                    0.45f,
+                    0.45f,
+                    0.1f,
+                    0.05f,
+                    1,
+                    1,
+                    "1PerPage",
+                    5,
+                    5,
+                    true,
+                    false
+            );
+            DocumentBuilder.buildOnePerPageBingoCards(documentConfig,bingoCardConfig);
+            DocumentBuilder.buildTwoPerPageBingoCards(TWO_PER_PAGE_OUTPUT_FILE);
+            DocumentBuilder.buildInstructionsTokensCallingCards(CALLING_CARDS_TOKES_RULES_OUTPUT_FILE);
         } catch (IOException e) {
             e.printStackTrace();
         }
