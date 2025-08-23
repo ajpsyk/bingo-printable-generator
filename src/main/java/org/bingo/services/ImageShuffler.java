@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class ImageShuffler {
-    public static Set<List<String>> getUniquePermutations(List<String> imageLabels, int numPermutations) {
+    public static List<List<String>> getUniquePermutations(List<String> imageLabels, int numPermutations) {
         Set<List<String>> uniquePermutations = new HashSet<>();
         while  (uniquePermutations.size() < numPermutations) {
             List<String> permutation = new ArrayList<>(imageLabels);
             Collections.shuffle(permutation);
             uniquePermutations.add(permutation);
         }
-        return uniquePermutations;
+        return new ArrayList<>(uniquePermutations);
     }
 }

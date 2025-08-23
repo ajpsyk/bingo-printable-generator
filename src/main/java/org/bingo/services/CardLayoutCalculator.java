@@ -121,7 +121,7 @@ public class CardLayoutCalculator {
         float spacingLeft = inchesToPoints(bingoCardConfig.getGridSpacingLeftInches());
 
         float gridX = pd.marginLeft() + spacingLeft;
-        float gridY = pd.marginBottom() +  spacingBottom;
+        float gridY = pd.marginBottom() + spacingBottom;
 
         return new XObjectTransform(
                 1f,
@@ -136,6 +136,4 @@ public class CardLayoutCalculator {
     private static float inchesToPoints(float inches) {
         return inches * 72f;
     }
-
-
 }
