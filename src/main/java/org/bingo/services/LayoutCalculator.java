@@ -12,7 +12,7 @@ import org.bingo.model.CardConfig;
 import org.bingo.model.PageDimensions;
 import org.bingo.model.XObjectTransform;
 
-public class CardLayoutCalculator {
+public class LayoutCalculator {
 
     public static PageDimensions getPageDimensions(PageSize ps, DocumentConfig docConfig) {
         float pageWidth = ps.getWidth();

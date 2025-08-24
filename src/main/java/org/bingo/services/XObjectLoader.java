@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.svg.converter.SvgConverter;
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import org.bingo.model.BingoSquare;
@@ -18,7 +21,7 @@ import java.io.IOException;
 
 
 
-public class ImageLoader {
+public class XObjectLoader {
 
     public static PdfFormXObject loadImage (Path resourcePath, PdfDocument document) throws IOException {
         PdfFormXObject image;
@@ -28,7 +31,7 @@ public class ImageLoader {
         return image;
     }
 
-    public static Map<String, BingoSquare> loadImageDirectory(Path resourceDir, PdfDocument document) throws IOException {
+    public static Map<String, BingoSquare> loadImageDirectory(Path resourceDir, PdfDocument document, PdfFont font) throws IOException {
         if (!Files.isDirectory(resourceDir) || Files.notExists(resourceDir)) {
             throw new IOException("Resource directory does not exist: " + resourceDir);
         }
@@ -37,11 +40,11 @@ public class ImageLoader {
 
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(resourceDir, "*.svg")) {
             for (Path path : directoryStream) {
-                String label = path.getFileName().toString().replaceFirst("[.][^.]+$", "");
+                String label = path.getFileName().toString().replaceFirst("[.][^.]+$", "").toUpperCase();
                 if (bingoIcons.containsKey(label)) {
                     throw new IllegalArgumentException("Duplicate image label: " + label);
                 }
-                PdfFormXObject labelImage = loadLabel(label, document);
+                PdfFormXObject labelImage = loadLabel(label, document, font);
                 PdfFormXObject image = loadImage(path, document);
                 bingoIcons.put(label, new BingoSquare(labelImage, image));
             }
@@ -49,7 +52,15 @@ public class ImageLoader {
         return bingoIcons;
     }
 
-    private static PdfFormXObject loadLabel (String label, PdfDocument document) {
-        return null;
+    private static PdfFormXObject loadLabel (String label, PdfDocument document, PdfFont font) {
+        String strippedSpaceLabel = label.replace(" ", "");
+        float labelWidth = font.getWidth(strippedSpaceLabel, 12);
+        float labelHeight = font.getAscent(strippedSpaceLabel, 12) - font.getDescent(strippedSpaceLabel, 12);
+
+        PdfFormXObject labelObject = new PdfFormXObject(new Rectangle(labelWidth, labelHeight));
+        PdfCanvas canvas = new PdfCanvas(labelObject, document);
+        canvas.beginText().setFontAndSize(font, 12).moveText(0,0).showText(label).endText();
+
+        return labelObject;
     }
 }

@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ImageShuffler {
+public class BingoSquareShuffler {
     public static List<List<String>> getUniquePermutations(List<String> imageLabels, int numPermutations) {
         Set<List<String>> uniquePermutations = new HashSet<>();
         while  (uniquePermutations.size() < numPermutations) {

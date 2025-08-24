@@ -1,5 +1,8 @@
 package org.bingo.services;
 
+import com.itextpdf.io.font.PdfEncodings;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfPage;
@@ -7,6 +10,8 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -20,20 +25,31 @@ public class DocumentBuilder {
             DocumentConfig docConfig,
             CardConfig bingoCardConfig
     ) throws IOException {
+
         PdfDocument document = new PdfDocument(new PdfWriter(docConfig.getOutput().toString()));
+        PageDimensions pd = LayoutCalculator.getPageDimensions(PageSize.LETTER, docConfig);
 
-        PdfFormXObject frame = ImageLoader.loadImage(docConfig.getFrame(), document);
-        PdfFormXObject header =  ImageLoader.loadImage(docConfig.getHeader(), document);
-        Map<String, BingoIcon> icons = ImageLoader.loadImageDirectory(docConfig.getIcons(), document);
+        PdfFont font = PdfFontFactory.createFont(
+                docConfig.getFont().toString(),
+                PdfEncodings.IDENTITY_H,
+                PdfFontFactory.EmbeddingStrategy.FORCE_EMBEDDED
+        );
 
-        PageDimensions pd = CardLayoutCalculator.getPageDimensions(PageSize.LETTER, docConfig);
-        XObjectTransform frameTransform = CardLayoutCalculator.getFrameTransform(frame, pd);
-        XObjectTransform headerTransform = CardLayoutCalculator.getHeaderTransform(header, bingoCardConfig, pd);
+        int cardAmount = bingoCardConfig.getCardAmount();
+
+        PdfFormXObject frame = XObjectLoader.loadImage(docConfig.getFrame(), document);
+        PdfFormXObject header =  XObjectLoader.loadImage(docConfig.getHeader(), document);
+        Map<String, BingoSquare> bingoSquares = XObjectLoader.loadImageDirectory(docConfig.getIcons(), document, font);
+        List<List<String>> permutations = BingoSquareShuffler.getUniquePermutations(new ArrayList<>(bingoSquares.keySet()), cardAmount);
+
+
+        XObjectTransform frameTransform = LayoutCalculator.getFrameTransform(frame, pd);
+        XObjectTransform headerTransform = LayoutCalculator.getHeaderTransform(header, bingoCardConfig, pd);
         float headerHeight = header.getHeight() * headerTransform.scaleY();
-        PdfFormXObject grid = CardLayoutCalculator.drawGrid(document, bingoCardConfig, pd, headerHeight);
-        XObjectTransform gridTransform = CardLayoutCalculator.getGridTransform(bingoCardConfig, pd);
+        PdfFormXObject grid = LayoutCalculator.drawGrid(document, bingoCardConfig, pd, headerHeight);
+        XObjectTransform gridTransform = LayoutCalculator.getGridTransform(bingoCardConfig, pd);
 
-        IntStream.range(0, bingoCardConfig.getCardAmount()).forEach(i -> {
+        IntStream.range(0, cardAmount).forEach(i -> {
             // create new page
             PdfPage page = document.addNewPage(PageSize.LETTER);
             PdfCanvas canvas = new PdfCanvas(page);
@@ -67,6 +83,36 @@ public class DocumentBuilder {
                     gridTransform.positionX(),
                     gridTransform.positionY()
             );
+
+            // add images and labels
+            List<String> permutation = permutations.get(i);
+
+            for (String icon : permutation) {
+                //PdfFormXObject label = bingoSquares.get(icon).label();
+                PdfFormXObject image = bingoSquares.get(icon).icon();
+                /*
+                canvas.addXObjectWithTransformationMatrix(
+                        image,
+                        imageTransform.scaleX(), // changes depending on row
+                        imageTransform.skewY(),
+                        imageTransform.skewX(),
+                        imageTransform.scaleY(), // changes depending on column
+                        imageTransform.positionX(),
+                        imageTransform.positionY()
+                );
+
+                canvas.addXObjectWithTransformationMatrix(
+                        label,
+                        labelTransform.scaleX(),
+                        labelTransform.skewY(),
+                        labelTransform.skewX(),
+                        labelTransform.scaleY(),
+                        labelTransform.positionX(),
+                        labelTransform.positionY()
+                );
+
+                */
+            }
         });
 
 
