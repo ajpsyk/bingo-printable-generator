@@ -3,6 +3,7 @@
  */
 package org.bingo;
 
+import com.itextpdf.kernel.colors.DeviceRgb;
 import org.bingo.services.DocumentBuilder;
 
 import java.io.IOException;
@@ -20,11 +21,11 @@ public class App {
             Path output = Paths.get("output");
             Path resources = Paths.get("resources");
             Path icons = resources.resolve("icons");
-            Path header = resources.resolve("Fall Nature Bingo Header.svg");
-            Path frame = resources.resolve("Fall Nature Frame.svg");
-            Path freeSpace = resources.resolve("Free Space.svg");
-            Path callingCardHeader = resources.resolve("Fall Nature Calling Cards Header.svg");
-            Path token = resources.resolve("Token.svg");
+            Path header = resources.resolve("Fall_Nature_Bingo_Header.png");
+            Path frame = resources.resolve("Fall_Nature_Frame.png");
+            Path freeSpace = resources.resolve("Free Space.png");
+            Path callingCardHeader = resources.resolve("Fall_Nature_Calling_Cards_Header.png");
+            Path token = resources.resolve("Token.png");
             Path instructions = resources.resolve("How To Play.pdf");
             Path font = resources.resolve("Dekko-Regular.ttf");
             Path scissorsIcon = resources.resolve("Scissors.png");
@@ -53,9 +54,9 @@ public class App {
             );
 
             CardConfig bingoCardConfig = new CardConfig(
-                    "#ffffff",
-                    "#ffffff",
-                    0.023f,
+                    new DeviceRgb(105, 98, 44),
+                    new DeviceRgb(113, 51, 29),
+                    0.014f,
                     0.25f,
                     0.5f,
                     0.3f,
@@ -63,9 +64,9 @@ public class App {
                     0.45f,
                     0.5f,
                     0.45f,
-                    0.1f,
-                    0.05f,
-                    50,
+                    0.08f,
+                    0.08f,
+                    5000,
                     1,
                     "1PerPage",
                     5,

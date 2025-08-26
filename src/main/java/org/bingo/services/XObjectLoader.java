@@ -5,6 +5,10 @@ import java.io.FileInputStream;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.ColorConstants;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -13,6 +17,7 @@ import com.itextpdf.svg.converter.SvgConverter;
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import org.bingo.model.BingoSquare;
 
+import javax.swing.text.StyleConstants;
 import java.nio.file.Path;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -24,42 +29,45 @@ import java.io.IOException;
 public class XObjectLoader {
 
     public static PdfFormXObject loadImage (Path resourcePath, PdfDocument document) throws IOException {
-        PdfFormXObject image;
-        try (FileInputStream stream = new FileInputStream(resourcePath.toFile())) {
-            image = SvgConverter.convertToXObject(stream, document);
-        }
+        ImageData imageData = ImageDataFactory.create(resourcePath.toAbsolutePath().toString());
+        PdfFormXObject image = new PdfFormXObject(new Rectangle(imageData.getWidth(), imageData.getHeight()));
+        PdfCanvas canvas = new PdfCanvas(image, document);
+        canvas.addImageAt(imageData, 0, 0, false);
         return image;
     }
 
-    public static Map<String, BingoSquare> loadImageDirectory(Path resourceDir, PdfDocument document, PdfFont font) throws IOException {
+    public static Map<String, BingoSquare> loadImageDirectory(Path resourceDir, PdfDocument document, PdfFont font, DeviceRgb color) throws IOException {
         if (!Files.isDirectory(resourceDir) || Files.notExists(resourceDir)) {
             throw new IOException("Resource directory does not exist: " + resourceDir);
         }
 
         Map<String, BingoSquare> bingoIcons = new HashMap<>();
 
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(resourceDir, "*.svg")) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(resourceDir, "*.png")) {
             for (Path path : directoryStream) {
                 String label = path.getFileName().toString().replaceFirst("[.][^.]+$", "").toUpperCase();
                 if (bingoIcons.containsKey(label)) {
                     throw new IllegalArgumentException("Duplicate image label: " + label);
                 }
-                PdfFormXObject labelImage = loadLabel(label, document, font);
-                PdfFormXObject image = loadImage(path, document);
-                bingoIcons.put(label, new BingoSquare(labelImage, image));
+                PdfFormXObject labelObject = loadLabel(label, document, font, color);
+                PdfFormXObject iconObject = loadImage(path, document);
+                bingoIcons.put(label, new BingoSquare(labelObject, iconObject));
             }
         }
         return bingoIcons;
     }
 
-    private static PdfFormXObject loadLabel (String label, PdfDocument document, PdfFont font) {
-        String strippedSpaceLabel = label.replace(" ", "");
-        float labelWidth = font.getWidth(strippedSpaceLabel, 12);
-        float labelHeight = font.getAscent(strippedSpaceLabel, 12) - font.getDescent(strippedSpaceLabel, 12);
+    private static PdfFormXObject loadLabel (String label, PdfDocument document, PdfFont font, DeviceRgb color) {
+        float labelWidth = font.getWidth(label, 20);
+
+        String heightSample = label.replace(" ", "");
+        float ascent = font.getAscent(heightSample, 20);
+        float descent = font.getDescent(heightSample, 20);
+        float labelHeight = ascent - descent;
 
         PdfFormXObject labelObject = new PdfFormXObject(new Rectangle(labelWidth, labelHeight));
         PdfCanvas canvas = new PdfCanvas(labelObject, document);
-        canvas.beginText().setFontAndSize(font, 12).moveText(0,0).showText(label).endText();
+        canvas.beginText().setFontAndSize(font, 20).setFillColor(color).moveText(0,-descent).showText(label).endText();
 
         return labelObject;
     }

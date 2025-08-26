@@ -107,7 +107,7 @@ public class LayoutCalculator {
             gridCanvas.moveTo(j * cellWidth + lineWidthOffset, lineWidthOffset)
                     .lineTo(j * cellWidth + lineWidthOffset, gridHeight - lineWidthOffset);
         }
-
+        gridCanvas.setStrokeColor(config.getGridColor());
         gridCanvas.stroke();
         return grid;
     }
@@ -132,6 +132,7 @@ public class LayoutCalculator {
                 gridY
         );
     }
+
 
     private static float inchesToPoints(float inches) {
         return inches * 72f;

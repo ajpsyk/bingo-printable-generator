@@ -2,12 +2,14 @@ package org.bingo.model;
 
 import lombok.Data;
 import lombok.AllArgsConstructor;
+import com.itextpdf.kernel.colors.DeviceRgb;
+
 
 @Data
 @AllArgsConstructor
 public class CardConfig {
-    private String gridColorHex;
-    private String labelColorHex;
+    private DeviceRgb gridColor;
+    private DeviceRgb labelColor;
 
     private float gridLineThicknessInches;
 

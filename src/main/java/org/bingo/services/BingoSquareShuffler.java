@@ -9,7 +9,7 @@ import java.util.Collections;
 public class BingoSquareShuffler {
     public static List<List<String>> getUniquePermutations(List<String> imageLabels, int numPermutations) {
         Set<List<String>> uniquePermutations = new HashSet<>();
-        while  (uniquePermutations.size() < numPermutations) {
+        while (uniquePermutations.size() < numPermutations) {
             List<String> permutation = new ArrayList<>(imageLabels);
             Collections.shuffle(permutation);
             uniquePermutations.add(permutation);
