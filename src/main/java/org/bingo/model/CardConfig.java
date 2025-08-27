@@ -22,8 +22,10 @@ public class CardConfig {
     private float gridSpacingBottomInches;
     private float gridSpacingLeftInches;
 
+    private float labelHeightRatio;
     private float cellSpacingXRatio;
     private float cellSpacingYRatio;
+    private float cellGapRatio;
 
     private int cardAmount;
     private int docAmount;

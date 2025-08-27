@@ -1,23 +1,20 @@
 package org.bingo.services;
 
 
-import java.io.FileInputStream;
 import java.util.Map;
 import java.util.HashMap;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
-import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.svg.converter.SvgConverter;
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import org.bingo.model.BingoSquare;
+import org.bingo.model.GridLayout;
 
-import javax.swing.text.StyleConstants;
 import java.nio.file.Path;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -36,7 +33,7 @@ public class XObjectLoader {
         return image;
     }
 
-    public static Map<String, BingoSquare> loadImageDirectory(Path resourceDir, PdfDocument document, PdfFont font, DeviceRgb color) throws IOException {
+    public static Map<String, BingoSquare> loadImageDirectory(Path resourceDir, PdfDocument document,GridLayout gl, PdfFont font, DeviceRgb color) throws IOException {
         if (!Files.isDirectory(resourceDir) || Files.notExists(resourceDir)) {
             throw new IOException("Resource directory does not exist: " + resourceDir);
         }
@@ -49,7 +46,7 @@ public class XObjectLoader {
                 if (bingoIcons.containsKey(label)) {
                     throw new IllegalArgumentException("Duplicate image label: " + label);
                 }
-                PdfFormXObject labelObject = loadLabel(label, document, font, color);
+                PdfFormXObject labelObject = loadLabel(label, gl, document, font, color);
                 PdfFormXObject iconObject = loadImage(path, document);
                 bingoIcons.put(label, new BingoSquare(labelObject, iconObject));
             }
@@ -57,17 +54,23 @@ public class XObjectLoader {
         return bingoIcons;
     }
 
-    private static PdfFormXObject loadLabel (String label, PdfDocument document, PdfFont font, DeviceRgb color) {
-        float labelWidth = font.getWidth(label, 20);
+    private static PdfFormXObject loadLabel(String label, GridLayout gl, PdfDocument document, PdfFont font, DeviceRgb color) {
+        float labelHeight = gl.labelHeight();
 
         String heightSample = label.replace(" ", "");
-        float ascent = font.getAscent(heightSample, 20);
-        float descent = font.getDescent(heightSample, 20);
-        float labelHeight = ascent - descent;
 
-        PdfFormXObject labelObject = new PdfFormXObject(new Rectangle(labelWidth, labelHeight));
+        float textWidth = font.getWidth(label, labelHeight);
+        float textHeight = font.getAscent(heightSample, labelHeight) - font.getDescent(heightSample, labelHeight);
+        float textPosY = (labelHeight - textHeight) / 2 - font.getDescent(heightSample, labelHeight);
+
+        PdfFormXObject labelObject = new PdfFormXObject(new Rectangle(textWidth, labelHeight));
         PdfCanvas canvas = new PdfCanvas(labelObject, document);
-        canvas.beginText().setFontAndSize(font, 20).setFillColor(color).moveText(0,-descent).showText(label).endText();
+        canvas.beginText()
+                .setFontAndSize(font, labelHeight)
+                .setFillColor(color)
+                .moveText(0, textPosY)
+                .showText(label)
+                .endText();
 
         return labelObject;
     }
