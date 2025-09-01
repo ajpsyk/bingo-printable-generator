@@ -34,6 +34,25 @@ public class LayoutCalculator {
         );
     }
 
+    public static PageDimensions getLandscapePageDimensions(
+            PageSize ps, DocumentConfig docConfig
+    ) {
+        float pageWidth = ps.getWidth();
+        float pageHeight = ps.getHeight();
+
+        float marginTop = inchesToPoints(docConfig.getMarginTopInches() * 2.5f);
+        float marginRight = inchesToPoints(docConfig.getMarginRightInches());
+        float marginBottom = inchesToPoints(docConfig.getMarginBottomInches() * 2.5f);
+        float marginLeft = inchesToPoints(docConfig.getMarginLeftInches());
+
+        float printSafeWidth = (pageWidth - 2 * marginRight - 2 * marginLeft) / 2f;
+        float printSafeHeight = pageHeight - marginTop - marginBottom;
+
+        return new PageDimensions(
+                printSafeWidth, printSafeHeight,  marginTop, marginRight, marginBottom, marginLeft
+        );
+    }
+
     public static XObjectTransform getFrameTransform(
             PdfFormXObject frame, PageDimensions pd
     ) {
@@ -57,7 +76,7 @@ public class LayoutCalculator {
 
         float scaleFactor = width / header.getWidth();
         float headerX = pd.marginLeft() + leftSpacing;
-        float headerY = pd.height() - topSpacing - height * scaleFactor;
+        float headerY = pd.height() - height * scaleFactor - topSpacing + pd.marginBottom();
 
         return new XObjectTransform(
                 scaleFactor, 0f, 0f, scaleFactor, headerX, headerY
@@ -119,12 +138,13 @@ public class LayoutCalculator {
 
     public static XObjectTransform getGridTransform(
             CardConfig bingoCardConfig,
-            PageDimensions pd
+            PageDimensions pd,
+            float xOffset
     ) {
         float spacingBottom = inchesToPoints(bingoCardConfig.getGridSpacingBottomInches());
         float spacingLeft = inchesToPoints(bingoCardConfig.getGridSpacingLeftInches());
 
-        float gridX = pd.marginLeft() + spacingLeft;
+        float gridX = pd.marginLeft() + spacingLeft + xOffset;
         float gridY = pd.marginBottom() + spacingBottom;
 
         return new XObjectTransform(

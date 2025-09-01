@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import com.itextpdf.kernel.colors.DeviceRgb;
 
+import java.nio.file.Path;
+
 
 @Data
 @AllArgsConstructor
@@ -12,6 +14,8 @@ public class CardConfig {
     private DeviceRgb labelColor;
 
     private float gridLineThicknessInches;
+    private float additionalMarginTop;
+    private float additionalMarginBottom;
 
     private float headerSpacingTopInches;
     private float headerSpacingRightInches;
@@ -30,7 +34,7 @@ public class CardConfig {
     private int cardAmount;
     private int docAmount;
 
-    private String fileName;
+    private Path fileName;
 
     private int rows;
     private int columns;

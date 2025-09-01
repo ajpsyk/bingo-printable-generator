@@ -11,4 +11,4 @@ public record GridLayout(
         float cellGap,
         float labelHeight,
         float usableWidth
-) { }
+) {}

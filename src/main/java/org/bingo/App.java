@@ -46,7 +46,7 @@ public class App {
                     instructions,
                     font,
                     scissorsIcon,
-                    ONE_PER_PAGE_OUTPUT_FILE,
+                    output,
                     0.25f,
                     0.25f,
                     0.25f,
@@ -57,9 +57,11 @@ public class App {
                     new DeviceRgb(105, 98, 44),
                     new DeviceRgb(113, 51, 29),
                     0.014f,
-                    0.25f,
+                    0f,
+                    0f,
                     0.5f,
-                    0.3f,
+                    0.5f,
+                    0.1f,
                     0.5f,
                     0.45f,
                     0.5f,
@@ -70,14 +72,40 @@ public class App {
                     0.1f,
                     100,
                     1,
-                    "1PerPage",
+                    ONE_PER_PAGE_OUTPUT_FILE,
+                    5,
+                    5,
+                    true,
+                    false
+            );
+
+            CardConfig landScapeCardConfig = new CardConfig(
+                    new DeviceRgb(105, 98, 44),
+                    new DeviceRgb(113, 51, 29),
+                    0.014f,
+                    0.625f,
+                    0.625f,
+                    0.35f,
+                    0.3f,
+                    0.05f,
+                    0.3f,
+                    0.3f,
+                    0.35f,
+                    0.3f,
+                    0.14f,
+                    0.16f,
+                    0.05f,
+                    0.1f,
+                    100,
+                    1,
+                    TWO_PER_PAGE_OUTPUT_FILE,
                     5,
                     5,
                     true,
                     false
             );
             DocumentBuilder.buildOnePerPageBingoCards(documentConfig,bingoCardConfig);
-            DocumentBuilder.buildTwoPerPageBingoCards(TWO_PER_PAGE_OUTPUT_FILE);
+            DocumentBuilder.buildTwoPerPageBingoCards(documentConfig, landScapeCardConfig);
             DocumentBuilder.buildInstructionsTokensCallingCards(CALLING_CARDS_TOKES_RULES_OUTPUT_FILE);
         } catch (IOException e) {
             e.printStackTrace();
