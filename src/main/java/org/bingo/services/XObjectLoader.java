@@ -46,7 +46,10 @@ public class XObjectLoader {
                 if (bingoIcons.containsKey(label)) {
                     throw new IllegalArgumentException("Duplicate image label: " + label);
                 }
-                PdfFormXObject labelObject = loadLabel(label, gl, document, font, color);
+                PdfFormXObject labelObject = null;
+                if (font != null) {
+                    labelObject = loadLabel(label, gl, document, font, color);
+                }
                 PdfFormXObject iconObject = loadImage(path, document);
                 bingoIcons.put(label, new BingoSquare(labelObject, iconObject));
             }

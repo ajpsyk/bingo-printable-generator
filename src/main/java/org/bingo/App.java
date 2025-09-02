@@ -32,7 +32,7 @@ public class App {
             Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve("FallNature_1PerPage.pdf");
             Path TWO_PER_PAGE_OUTPUT_FILE = output.resolve("FallNature_2PerPage.pdf");
             Path CALLING_CARDS_TOKES_RULES_OUTPUT_FILE = output.resolve(
-                    "FallNature_CallingCards, Tokens, & Rules.pdf"
+                    "FallNature_Calling Cards, Tokens, & Rules.pdf"
             );
 
             DocumentConfig documentConfig = new DocumentConfig(
@@ -104,9 +104,61 @@ public class App {
                     true,
                     false
             );
+
+            CardConfig tokensConfig = new CardConfig(
+                    new DeviceRgb(0, 0, 0),
+                    new DeviceRgb(113, 51, 29),
+                    0.014f,
+                    0.625f,
+                    0.625f,
+                    0f,
+                    6.8f,
+                    0.2f,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0.14f,
+                    0.16f,
+                    0.05f,
+                    0.1f,
+                    1,
+                    1,
+                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
+                    9,
+                    9,
+                    true,
+                    false
+            );
+
+            CardConfig callingCardsConfig = new CardConfig(
+                    new DeviceRgb(0, 0, 0),
+                    new DeviceRgb(113, 51, 29),
+                    0.014f,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0.2f,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0.14f,
+                    0.16f,
+                    0.05f,
+                    0.1f,
+                    1,
+                    1,
+                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
+                    6,
+                    5,
+                    true,
+                    false
+            );
             DocumentBuilder.buildOnePerPageBingoCards(documentConfig,bingoCardConfig);
             DocumentBuilder.buildTwoPerPageBingoCards(documentConfig, landScapeCardConfig);
-            DocumentBuilder.buildInstructionsTokensCallingCards(CALLING_CARDS_TOKES_RULES_OUTPUT_FILE);
+            DocumentBuilder.buildInstructionsTokensCallingCards(documentConfig, tokensConfig, callingCardsConfig);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -201,6 +201,7 @@ public class LayoutCalculator {
                 PdfFormXObject label = bingoSquares.get(square).label();
                 PdfFormXObject image = bingoSquares.get(square).icon();
 
+
                 float labelPosX = gridX + col * cellWidth + (cellWidth - label.getWidth()) / 2;
                 float labelPosY = gridY + row * cellHeight + cellPaddingY;
 
@@ -222,6 +223,42 @@ public class LayoutCalculator {
 
                 canvas.addXObjectWithTransformationMatrix(
                         image, imageScale, 0f, 0f, imageScale, imagePosX, imagePosY
+                );
+            }
+        }
+    }
+
+    public static void addTokensToGrid(
+            CardConfig config,
+            GridLayout gridLayout,
+            XObjectTransform gridTransform,
+            PdfFormXObject token,
+            PdfCanvas canvas
+    ) {
+        int rows = config.getRows();
+        int cols = config.getColumns();
+        float cellWidth = gridLayout.cellWidth();
+        float cellHeight = gridLayout.cellHeight();
+        float cellPaddingY = gridLayout.cellPaddingY();
+        float gridX = gridTransform.positionX();
+        float gridY = gridTransform.positionY();
+        float usableWidth = gridLayout.usableWidth();
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                float availableImageHeight = cellHeight - cellPaddingY;
+                float imageScaleX = usableWidth / token.getWidth();
+                float imageScaleY = availableImageHeight / token.getHeight();
+                float imageScale = Math.min(imageScaleX, imageScaleY);
+
+                float scaledImageWidth  = token.getWidth() * imageScale;
+                float scaledImageHeight = token.getHeight() * imageScale;
+
+                float imagePosX = gridX + col * cellWidth + (cellWidth - scaledImageWidth) / 2;
+                float imagePosY = gridY + row * cellHeight + cellPaddingY / 2
+                        + (availableImageHeight - scaledImageHeight) / 2;
+                canvas.addXObjectWithTransformationMatrix(
+                        token, imageScale, 0f, 0f, imageScale, imagePosX, imagePosY
                 );
             }
         }
