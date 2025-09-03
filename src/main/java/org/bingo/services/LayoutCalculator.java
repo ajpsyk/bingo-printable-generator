@@ -84,7 +84,7 @@ public class LayoutCalculator {
     }
 
     public static GridLayout drawGrid (
-            PdfDocument document, CardConfig config, PageDimensions pd, float headerHeight
+            PdfDocument document, CardConfig config, PageDimensions pd, float headerHeight, boolean dotted
     ) {
         float lineWidth = inchesToPoints(config.getGridLineThicknessInches());
         float lineWidthOffset = lineWidth / 2;
@@ -120,6 +120,9 @@ public class LayoutCalculator {
         }
 
         gridCanvas.setStrokeColor(config.getGridColor());
+        if (dotted) {
+            gridCanvas.setLineDash(3f, 3f);
+        }
         gridCanvas.stroke();
 
         float cellPaddingX = cellWidth * config.getCellSpacingXRatio();
@@ -179,7 +182,7 @@ public class LayoutCalculator {
 
         Iterator<String> permutationIterator = permutation.iterator();
 
-        for (int row = 0; row < rows; row++) {
+        for (int row = rows - 1; row >= 0; row--) {
             for (int col = 0; col < cols; col++) {
                 if (freeSpace != null && row == rows / 2 && col == cols / 2) {
                     float freeScaleX = cellWidth / freeSpace.getWidth();

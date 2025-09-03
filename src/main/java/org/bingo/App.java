@@ -106,9 +106,9 @@ public class App {
             );
 
             CardConfig tokensConfig = new CardConfig(
-                    new DeviceRgb(0, 0, 0),
+                    new DeviceRgb(115, 115, 115),
                     new DeviceRgb(113, 51, 29),
-                    0.014f,
+                    0.007f,
                     0.625f,
                     0.625f,
                     0f,
@@ -132,9 +132,9 @@ public class App {
             );
 
             CardConfig callingCardsConfig = new CardConfig(
-                    new DeviceRgb(0, 0, 0),
+                    new DeviceRgb(114, 98, 44),
                     new DeviceRgb(113, 51, 29),
-                    0.014f,
+                    0.007f,
                     0f,
                     0f,
                     0f,
@@ -156,9 +156,64 @@ public class App {
                     true,
                     false
             );
+
+            CardConfig multiCallingCardsConfig = new CardConfig(
+                    new DeviceRgb(115, 115, 115),
+                    new DeviceRgb(113, 51, 29),
+                    0.007f,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0.2f,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0.14f,
+                    0.16f,
+                    0.05f,
+                    0.1f,
+                    1,
+                    1,
+                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
+                    2,
+                    2,
+                    true,
+                    false
+            );
+
+            CardConfig multiCallingLastCardsConfig = new CardConfig(
+                    new DeviceRgb(115, 115, 115),
+                    new DeviceRgb(113, 51, 29),
+                    0.007f,
+                    0f,
+                    0f,
+                    0f,
+                    0f,
+                    0.2f,
+                    0f,
+                    0f,
+                    4.7f,
+                    0f,
+                    0.14f,
+                    0.16f,
+                    0.05f,
+                    0.1f,
+                    1,
+                    1,
+                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
+                    1,
+                    2,
+                    true,
+                    false
+            );
             DocumentBuilder.buildOnePerPageBingoCards(documentConfig,bingoCardConfig);
             DocumentBuilder.buildTwoPerPageBingoCards(documentConfig, landScapeCardConfig);
-            DocumentBuilder.buildInstructionsTokensCallingCards(documentConfig, tokensConfig, callingCardsConfig);
+            DocumentBuilder.buildInstructionsTokensCallingCards(
+                    documentConfig, tokensConfig, callingCardsConfig,
+                    multiCallingCardsConfig, multiCallingLastCardsConfig
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }

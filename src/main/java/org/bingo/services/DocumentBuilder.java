@@ -11,9 +11,7 @@ import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
@@ -47,13 +45,13 @@ public class DocumentBuilder {
         XObjectTransform frameTransform = LayoutCalculator.getFrameTransform(frame, pd);
         XObjectTransform headerTransform = LayoutCalculator.getHeaderTransform(header, bingoCardConfig, pd);
         float headerHeight = header.getHeight() * headerTransform.scaleY();
-        GridLayout gridLayout = LayoutCalculator.drawGrid(document, bingoCardConfig, pd, headerHeight);
+        GridLayout gridLayout = LayoutCalculator.drawGrid(document, bingoCardConfig, pd, headerHeight, false);
         XObjectTransform gridTransform = LayoutCalculator.getGridTransform(bingoCardConfig, pd, 0f);
         Map<String, BingoSquare> bingoSquares = XObjectLoader.loadImageDirectory(
                 docConfig.getIcons(), document, gridLayout, font, fontColor
         );
         List<List<String>> permutations = BingoSquareShuffler.getUniquePermutations(
-                new ArrayList<>(bingoSquares.keySet()), cardAmount
+                new ArrayList<>(bingoSquares.keySet()), cardAmount, 1
         );
 
         IntStream.range(0, cardAmount).forEach(i -> {
@@ -131,7 +129,7 @@ public class DocumentBuilder {
         XObjectTransform headerTransform = LayoutCalculator.getHeaderTransform(header, cardConfig, pd);
 
         float headerHeight = header.getHeight() * headerTransform.scaleY();
-        GridLayout gridLayout = LayoutCalculator.drawGrid(document, cardConfig, pd, headerHeight);
+        GridLayout gridLayout = LayoutCalculator.drawGrid(document, cardConfig, pd, headerHeight, false);
         XObjectTransform gridTransform = LayoutCalculator.getGridTransform(cardConfig, pd, 0);
         XObjectTransform gridTransformXOffset = LayoutCalculator.getGridTransform(cardConfig, pd, xOffset);
 
@@ -139,7 +137,7 @@ public class DocumentBuilder {
                 docConfig.getIcons(), document, gridLayout, font, fontColor
         );
         List<List<String>> permutations = BingoSquareShuffler.getUniquePermutations(
-                new ArrayList<>(bingoSquares.keySet()), cardAmount
+                new ArrayList<>(bingoSquares.keySet()), cardAmount, 1
         );
 
 
@@ -233,8 +231,18 @@ public class DocumentBuilder {
     }
 
     public static void buildInstructionsTokensCallingCards (
-            DocumentConfig docConfig, CardConfig tokenConfig, CardConfig callingCardsConfig) throws IOException {
-        PdfDocument document = new PdfDocument(new PdfReader(docConfig.getInstructions().toString()), new PdfWriter(tokenConfig.getFileName().toString()));
+            DocumentConfig docConfig,
+            CardConfig tokenConfig,
+            CardConfig callingCardsConfig,
+            CardConfig multiCallingCardsConfig,
+            CardConfig multiCallingLastCardsConfig
+    ) throws IOException {
+
+        // Tokens
+        PdfDocument document = new PdfDocument(
+                new PdfReader(docConfig.getInstructions().toString()),
+                new PdfWriter(tokenConfig.getFileName().toString())
+        );
         PageDimensions pd = LayoutCalculator.getPageDimensions(PageSize.LETTER, docConfig);
         PdfPage page = document.addNewPage(PageSize.LETTER);
         PdfCanvas canvas = new PdfCanvas(page);
@@ -260,7 +268,7 @@ public class DocumentBuilder {
         );
 
         float scissorsHeight = scissors.getHeight() * scissorsTransform.scaleY();
-        GridLayout gridLayout = LayoutCalculator.drawGrid(document, tokenConfig, pd, scissorsHeight);
+        GridLayout gridLayout = LayoutCalculator.drawGrid(document, tokenConfig, pd, scissorsHeight, true);
         XObjectTransform gridTransform = LayoutCalculator.getGridTransform(tokenConfig, pd, 0);
         canvas.addXObjectWithTransformationMatrix(
                 gridLayout.grid(),
@@ -281,12 +289,16 @@ public class DocumentBuilder {
                 token,
                 canvas
         );
+
+
         // Calling Cards Single
         PdfPage page2 = document.addNewPage(PageSize.LETTER);
         PdfCanvas canvas2 = new PdfCanvas(page2);
 
         PdfFormXObject callingCardHeader = XObjectLoader.loadImage(docConfig.getCallingCardsHeader(), document);
-        XObjectTransform callingCardHeaderTransform = LayoutCalculator.getHeaderTransform(callingCardHeader, callingCardsConfig, pd);
+        XObjectTransform callingCardHeaderTransform = LayoutCalculator.getHeaderTransform(
+                callingCardHeader, callingCardsConfig, pd
+        );
         canvas2.addXObjectWithTransformationMatrix(
                 callingCardHeader,
                 callingCardHeaderTransform.scaleX(),
@@ -297,7 +309,7 @@ public class DocumentBuilder {
                 callingCardHeaderTransform.positionY()
         );
         float headerHeight = callingCardHeader.getHeight() * callingCardHeaderTransform.scaleY();
-        GridLayout ccGridLayout = LayoutCalculator.drawGrid(document, callingCardsConfig, pd, headerHeight);
+        GridLayout ccGridLayout = LayoutCalculator.drawGrid(document, callingCardsConfig, pd, headerHeight, false);
         XObjectTransform ccGridTransform = LayoutCalculator.getGridTransform(callingCardsConfig, pd, 0);
         canvas2.addXObjectWithTransformationMatrix(
                 ccGridLayout.grid(),
@@ -309,17 +321,98 @@ public class DocumentBuilder {
                 ccGridTransform.positionY()
         );
 
-        Map<String, BingoSquare> bingoSquares = XObjectLoader.loadImageDirectory(
-                docConfig.getIcons(), document, gridLayout, font, fontColor
+        Map<String, BingoSquare> ccSquares = XObjectLoader.loadImageDirectory(
+                docConfig.getIcons(), document, ccGridLayout, font, fontColor
         );
 
-        List<List<String>> permutations = BingoSquareShuffler.getUniquePermutations(
-                new ArrayList<>(bingoSquares.keySet()), callingCardsConfig.getCardAmount()
+
+        List<String> labelsInOrder = new ArrayList<>(ccSquares.keySet());
+        labelsInOrder.sort(Comparator.naturalOrder());
+        LayoutCalculator.addImagesAndLabelsToGrid(
+                callingCardsConfig,
+                ccGridLayout,
+                ccGridTransform,
+                labelsInOrder,
+                ccSquares,
+                null,
+                canvas2
         );
-            // place images and labels
+
         // Calling Cards Multi
-            // determine pages needed (4 cards per page)
-            // scissors on each page
+        GridLayout multiGridLayout = LayoutCalculator.drawGrid(document, multiCallingCardsConfig, pd, headerHeight, true);
+        XObjectTransform multiGridTransform = LayoutCalculator.getGridTransform(multiCallingCardsConfig, pd, 0);
+        Map<String, BingoSquare> multiSquares = XObjectLoader.loadImageDirectory(
+                docConfig.getIcons(), document, multiGridLayout, font, fontColor
+        );
+        for (int i = 0; i < 7; i++) {
+            PdfPage page3 = document.addNewPage(PageSize.LETTER);
+            PdfCanvas canvas3 = new PdfCanvas(page3);
+
+            canvas3.addXObjectWithTransformationMatrix(
+                    scissors,
+                    scissorsTransform.scaleX(),
+                    scissorsTransform.skewY(),
+                    scissorsTransform.skewX(),
+                    scissorsTransform.scaleY(),
+                    scissorsTransform.positionX(),
+                    scissorsTransform.positionY()
+            );
+
+            canvas3.addXObjectWithTransformationMatrix(
+                    multiGridLayout.grid(),
+                    multiGridTransform.scaleX(),
+                    multiGridTransform.skewY(),
+                    multiGridTransform.skewX(),
+                    multiGridTransform.scaleY(),
+                    multiGridTransform.positionX(),
+                    multiGridTransform.positionY()
+            );
+
+            LayoutCalculator.addImagesAndLabelsToGrid(
+                    multiCallingCardsConfig,
+                    multiGridLayout,
+                    multiGridTransform,
+                    labelsInOrder.subList(i * 4, i * 4 + 4),
+                    multiSquares,
+                    null,
+                    canvas3
+            );
+        }
+        GridLayout multiGridLayoutLastPage =  LayoutCalculator.drawGrid(document, multiCallingLastCardsConfig, pd, headerHeight, true);
+        XObjectTransform multiGridLastTransform = LayoutCalculator.getGridTransform(multiCallingLastCardsConfig, pd, 0);
+        PdfPage page4 = document.addNewPage(PageSize.LETTER);
+        PdfCanvas canvas4 = new PdfCanvas(page4);
+        canvas4.addXObjectWithTransformationMatrix(
+                scissors,
+                scissorsTransform.scaleX(),
+                scissorsTransform.skewY(),
+                scissorsTransform.skewX(),
+                scissorsTransform.scaleY(),
+                scissorsTransform.positionX(),
+                scissorsTransform.positionY()
+        );
+
+        canvas4.addXObjectWithTransformationMatrix(
+                multiGridLayoutLastPage.grid(),
+                multiGridLastTransform.scaleX(),
+                multiGridLastTransform.skewY(),
+                multiGridLastTransform.skewX(),
+                multiGridLastTransform.scaleY(),
+                multiGridLastTransform.positionX(),
+                multiGridLastTransform.positionY()
+        );
+
+        LayoutCalculator.addImagesAndLabelsToGrid(
+                multiCallingLastCardsConfig,
+                multiGridLayoutLastPage,
+                multiGridLastTransform,
+                labelsInOrder.subList(28, 30),
+                multiSquares,
+                null,
+                canvas4
+        );
+
+
 
         document.close();
     }
