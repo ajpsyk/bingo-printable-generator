@@ -4,6 +4,8 @@
 package org.bingo;
 
 import com.itextpdf.kernel.colors.DeviceRgb;
+import com.itextpdf.kernel.geom.PageSize;
+import org.bingo.model.AssetPaths;
 import org.bingo.services.DocumentBuilder;
 
 import java.io.IOException;
@@ -11,207 +13,122 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.bingo.model.DocumentConfig;
-import org.bingo.model.CardConfig;
+import org.bingo.model.PageConfig;
 
 public class App {
 
     public static void main(String[] args) {
         try {
-
+            String THEME_NAME = "Dark Academia";
             Path output = Paths.get("output");
             Path resources = Paths.get("resources");
-            Path icons = resources.resolve("icons");
-            Path header = resources.resolve("Fall_Nature_Bingo_Header.png");
-            Path frame = resources.resolve("Fall_Nature_Frame.png");
-            Path freeSpace = resources.resolve("Free Space.png");
-            Path callingCardHeader = resources.resolve("Fall_Nature_Calling_Cards_Header.png");
-            Path token = resources.resolve("Token.png");
-            Path instructions = resources.resolve("How To Play.pdf");
-            Path font = resources.resolve("Dekko-Regular.ttf");
-            Path scissorsIcon = resources.resolve("Scissors.png");
-            Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve("FallNature_1PerPage.pdf");
-            Path TWO_PER_PAGE_OUTPUT_FILE = output.resolve("FallNature_2PerPage.pdf");
-            Path CALLING_CARDS_TOKES_RULES_OUTPUT_FILE = output.resolve(
-                    "FallNature_Calling Cards, Tokens, & Rules.pdf"
+            Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_1PerPage.pdf");
+            Path TWO_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_2PerPage.pdf");
+            Path CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE = output.resolve(
+                    THEME_NAME + "_Calling Cards_Tokens_Rules.pdf"
             );
 
-            DocumentConfig documentConfig = new DocumentConfig(
-                    "Fall Nature",
-                    icons,
-                    header,
-                    frame,
-                    freeSpace,
-                    callingCardHeader,
-                    token,
-                    instructions,
-                    font,
-                    scissorsIcon,
-                    output,
-                    0.25f,
-                    0.25f,
-                    0.25f,
-                    0.25f
-            );
+            AssetPaths onePerPageBingoPaths = AssetPaths.builder()
+                    .framePath(resources.resolve("frame.png"))
+                    .headerPath(resources.resolve("header.png"))
+                    .iconsPath(resources.resolve("icons"))
+                    .fontPath(resources.resolve("Dekko-Regular.ttf"))
+                    .freeSpacePath(resources.resolve("Free Space.png"))
+                    .instructionsPath(resources.resolve("How To Play.pdf"))
+                    .scissorsIconPath(resources.resolve("Scissors.png"))
+                    .tokenPath(resources.resolve("Token.png"))
+                    .callingCardsHeaderPath(resources.resolve("calling_card_header.png"))
+                    .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
+                    .build();
 
-            CardConfig bingoCardConfig = new CardConfig(
-                    new DeviceRgb(105, 98, 44),
-                    new DeviceRgb(113, 51, 29),
-                    0.014f,
-                    0f,
-                    0f,
-                    0.5f,
-                    0.5f,
-                    0.1f,
-                    0.5f,
-                    0.45f,
-                    0.5f,
-                    0.45f,
-                    0.14f,
-                    0.16f,
-                    0.05f,
-                    0.1f,
-                    100,
-                    1,
-                    ONE_PER_PAGE_OUTPUT_FILE,
-                    5,
-                    5,
-                    true,
-                    false
-            );
+            AssetPaths twoPerPageBingoPaths = onePerPageBingoPaths.toBuilder()
+                    .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
+                    .build();
 
-            CardConfig landScapeCardConfig = new CardConfig(
-                    new DeviceRgb(105, 98, 44),
-                    new DeviceRgb(113, 51, 29),
-                    0.014f,
-                    0.625f,
-                    0.625f,
-                    0.35f,
-                    0.3f,
-                    0.05f,
-                    0.3f,
-                    0.3f,
-                    0.35f,
-                    0.3f,
-                    0.14f,
-                    0.16f,
-                    0.05f,
-                    0.1f,
-                    100,
-                    1,
-                    TWO_PER_PAGE_OUTPUT_FILE,
-                    5,
-                    5,
-                    true,
-                    false
-            );
+            AssetPaths callingCardsTokensRulesPaths = onePerPageBingoPaths.toBuilder()
+                    .outputPath(CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE)
+                    .build();
 
-            CardConfig tokensConfig = new CardConfig(
-                    new DeviceRgb(115, 115, 115),
-                    new DeviceRgb(113, 51, 29),
-                    0.007f,
-                    0.625f,
-                    0.625f,
-                    0f,
-                    6.8f,
-                    0.2f,
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0.14f,
-                    0.16f,
-                    0.05f,
-                    0.1f,
-                    1,
-                    1,
-                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
-                    9,
-                    9,
-                    true,
-                    false
-            );
+            DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
+                    .assets(onePerPageBingoPaths)
+                    .fontColor(new DeviceRgb(88, 26, 77))
+                    .marginTopInches(0.25f)
+                    .marginBottomInches(0.25f)
+                    .marginLeftInches(0.25f)
+                    .marginRightInches(0.25f)
+                    .build();
 
-            CardConfig callingCardsConfig = new CardConfig(
-                    new DeviceRgb(114, 98, 44),
-                    new DeviceRgb(113, 51, 29),
-                    0.007f,
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0.2f,
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0.14f,
-                    0.16f,
-                    0.05f,
-                    0.1f,
-                    1,
-                    1,
-                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
-                    6,
-                    5,
-                    true,
-                    false
-            );
+            DocumentConfig twoPerPageBingoCards = onePerPageBingoCards.toBuilder()
+                    .assets(twoPerPageBingoPaths)
+                    .pageSize(PageSize.LETTER.rotate())
+                    .build();
 
-            CardConfig multiCallingCardsConfig = new CardConfig(
-                    new DeviceRgb(115, 115, 115),
-                    new DeviceRgb(113, 51, 29),
-                    0.007f,
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0.2f,
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0.14f,
-                    0.16f,
-                    0.05f,
-                    0.1f,
-                    1,
-                    1,
-                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
-                    2,
-                    2,
-                    true,
-                    false
-            );
+            DocumentConfig instructionsTokensCallingCards = onePerPageBingoCards.toBuilder()
+                    .assets(callingCardsTokensRulesPaths)
+                    .build();
 
-            CardConfig multiCallingLastCardsConfig = new CardConfig(
-                    new DeviceRgb(115, 115, 115),
-                    new DeviceRgb(113, 51, 29),
-                    0.007f,
-                    0f,
-                    0f,
-                    0f,
-                    0f,
-                    0.2f,
-                    0f,
-                    0f,
-                    4.7f,
-                    0f,
-                    0.14f,
-                    0.16f,
-                    0.05f,
-                    0.1f,
-                    1,
-                    1,
-                    CALLING_CARDS_TOKES_RULES_OUTPUT_FILE,
-                    1,
-                    2,
-                    true,
-                    false
-            );
-            DocumentBuilder.buildOnePerPageBingoCards(documentConfig,bingoCardConfig);
-            DocumentBuilder.buildTwoPerPageBingoCards(documentConfig, landScapeCardConfig);
-            DocumentBuilder.buildInstructionsTokensCallingCards(
-                    documentConfig, tokensConfig, callingCardsConfig,
+            PageConfig portraitBingo = PageConfig.builder()
+                    .headerSpacingTopInches(0.3f)
+                    .headerSpacingRightInches(0.3f)
+                    .headerSpacingBottomInches(0.3f)
+                    .headerSpacingLeftInches(0.3f)
+                    .gridLineColor(new DeviceRgb(125, 96, 85))
+                    .gridRowAmount(5)
+                    .gridColumnAmount(5)
+                    .gridLineThicknessInches(0.0018f)
+                    .gridSpacingRightInches(0.3f)
+                    .gridSpacingLeftInches(0.3f)
+                    .gridSpacingBottomInches(0.3f)
+                    .labelHeightRatio(0.14f)
+                    .cellSpacingXRatio(0.05f)
+                    .cellSpacingYRatio(0.05f)
+                    .cellGapRatio(0.05f)
+                    .copies(100)
+                    .build();
+
+            PageConfig landScapeBingo = portraitBingo.toBuilder()
+                    .build();
+
+            PageConfig tokens = portraitBingo.toBuilder()
+                    .gridLineColor(new DeviceRgb(115, 115, 115))
+                    .gridRowAmount(9)
+                    .gridColumnAmount(9)
+                    .copies(1)
+                    .headerSpacingTopInches(0f)
+                    .headerSpacingLeftInches(0f)
+                    .gridSpacingBottomInches(0f)
+                    .gridSpacingRightInches(0f)
+                    .gridSpacingLeftInches(0f)
+                    .headerSpacingRightInches(6.8f)
+                    .labelHeightRatio(0)
+                    .build();
+
+            PageConfig callingCardsSinglePage = portraitBingo.toBuilder()
+                    .gridRowAmount(6)
+                    .gridColumnAmount(5)
+                    .copies(1)
+                    .gridLineThicknessInches(0.022f)
+                    .headerSpacingTopInches(0f)
+                    .headerSpacingBottomInches(0.1f)
+                    .gridSpacingRightInches(0f)
+                    .gridSpacingLeftInches(0f)
+                    .gridSpacingBottomInches(0f)
+                    .gridSpacingRightInches(0f)
+                    .build();
+
+            PageConfig multiCallingCardsConfig = callingCardsSinglePage.toBuilder()
+                    .gridRowAmount(2)
+                    .gridColumnAmount(2)
+                    .build();
+
+            PageConfig multiCallingLastCardsConfig = multiCallingCardsConfig.toBuilder()
+                    .gridRowAmount(1)
+                    .build();
+
+            DocumentBuilder.buildOnePerPageBingoCards(onePerPageBingoCards, portraitBingo);
+            DocumentBuilder.buildTwoPerPageBingoCards(twoPerPageBingoCards, landScapeBingo);
+            DocumentBuilder.buildInstructionsTokensCallingCards(instructionsTokensCallingCards,
+                    tokens, callingCardsSinglePage,
                     multiCallingCardsConfig, multiCallingLastCardsConfig
             );
         } catch (IOException e) {

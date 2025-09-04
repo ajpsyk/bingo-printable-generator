@@ -1,43 +1,32 @@
 package org.bingo.model;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.AllArgsConstructor;
 import com.itextpdf.kernel.colors.DeviceRgb;
 
-import java.nio.file.Path;
-
-
+/**
+ * Holds page level configurations.
+ */
 @Data
-@AllArgsConstructor
-public class CardConfig {
-    private DeviceRgb gridColor;
+@Builder(toBuilder = true)
+public class PageConfig {
+    @Builder.Default float headerSpacingTopInches = 0f;
+    @Builder.Default float headerSpacingRightInches = 0f;
+    @Builder.Default float headerSpacingBottomInches = 0f;
+    @Builder.Default float headerSpacingLeftInches = 0f;
 
-    private float gridLineThicknessInches;
-    private float additionalMarginTop;
-    private float additionalMarginBottom;
+    @Builder.Default DeviceRgb gridLineColor = new DeviceRgb(0,0,0);
+    @Builder.Default int gridRowAmount = 0;
+    @Builder.Default int gridColumnAmount = 0;
+    @Builder.Default float gridLineThicknessInches = 0f;
+    @Builder.Default float gridSpacingRightInches = 0f;
+    @Builder.Default float gridSpacingBottomInches = 0f;
+    @Builder.Default float gridSpacingLeftInches = 0f;
 
-    private float headerSpacingTopInches;
-    private float headerSpacingRightInches;
-    private float headerSpacingBottomInches;
-    private float headerSpacingLeftInches;
+    @Builder.Default float labelHeightRatio = 0f;
+    @Builder.Default float cellSpacingXRatio = 0f;
+    @Builder.Default float cellSpacingYRatio = 0f;
+    @Builder.Default float cellGapRatio = 0f;
 
-    private float gridSpacingRightInches;
-    private float gridSpacingBottomInches;
-    private float gridSpacingLeftInches;
-
-    private float labelHeightRatio;
-    private float cellSpacingXRatio;
-    private float cellSpacingYRatio;
-    private float cellGapRatio;
-
-    private int cardAmount;
-    private int docAmount;
-
-    private Path fileName;
-
-    private int rows;
-    private int columns;
-
-    private boolean freeSpaceEnabled;
-    private boolean scissorsIconEnabled;
+    @Builder.Default int copies = 0;
 }

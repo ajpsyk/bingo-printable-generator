@@ -13,7 +13,7 @@ import lombok.NonNull;
  * Holds document level configurations.
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class DocumentConfig {
     @NonNull AssetPaths assets;
 

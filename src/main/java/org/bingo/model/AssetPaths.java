@@ -10,7 +10,7 @@ import java.nio.file.Path;
  * Holds file paths required for generating bingo PDFs.
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class AssetPaths {
     @NonNull Path framePath;
     @NonNull Path headerPath;
