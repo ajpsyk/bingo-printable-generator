@@ -38,19 +38,11 @@ public class App {
                     .scissorsIconPath(resources.resolve("Scissors.png"))
                     .tokenPath(resources.resolve("Token.png"))
                     .callingCardsHeaderPath(resources.resolve("calling_card_header.png"))
-                    .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
-                    .build();
-
-            AssetPaths twoPerPageBingoPaths = onePerPageBingoPaths.toBuilder()
-                    .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
-                    .build();
-
-            AssetPaths callingCardsTokensRulesPaths = onePerPageBingoPaths.toBuilder()
-                    .outputPath(CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE)
                     .build();
 
             DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
                     .assets(onePerPageBingoPaths)
+                    .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
                     .fontColor(new DeviceRgb(88, 26, 77))
                     .marginTopInches(0.25f)
                     .marginBottomInches(0.25f)
@@ -59,12 +51,12 @@ public class App {
                     .build();
 
             DocumentConfig twoPerPageBingoCards = onePerPageBingoCards.toBuilder()
-                    .assets(twoPerPageBingoPaths)
+                    .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
                     .pageSize(PageSize.LETTER.rotate())
                     .build();
 
             DocumentConfig instructionsTokensCallingCards = onePerPageBingoCards.toBuilder()
-                    .assets(callingCardsTokensRulesPaths)
+                    .outputPath(CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE)
                     .build();
 
             PageConfig portraitBingo = PageConfig.builder()

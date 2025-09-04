@@ -21,5 +21,4 @@ public class AssetPaths {
     @NonNull Path scissorsIconPath;
     @NonNull Path tokenPath;
     @NonNull Path callingCardsHeaderPath;
-    @NonNull Path outputPath;
 }
