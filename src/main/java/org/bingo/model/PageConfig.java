@@ -11,7 +11,6 @@ import java.nio.file.Path;
 @AllArgsConstructor
 public class CardConfig {
     private DeviceRgb gridColor;
-    private DeviceRgb labelColor;
 
     private float gridLineThicknessInches;
     private float additionalMarginTop;
