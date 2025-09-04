@@ -65,11 +65,11 @@ public class LayoutCalculator {
     }
 
     public static XObjectTransform getHeaderTransform(
-            PdfFormXObject header, CardConfig bingoCardConfig, PageDimensions pd
+            PdfFormXObject header, PageConfig bingoPageConfig, PageDimensions pd
     ) {
-        float topSpacing = inchesToPoints(bingoCardConfig.getHeaderSpacingTopInches());
-        float rightSpacing = inchesToPoints(bingoCardConfig.getHeaderSpacingRightInches());
-        float leftSpacing = inchesToPoints(bingoCardConfig.getHeaderSpacingLeftInches());
+        float topSpacing = inchesToPoints(bingoPageConfig.getHeaderSpacingTopInches());
+        float rightSpacing = inchesToPoints(bingoPageConfig.getHeaderSpacingRightInches());
+        float leftSpacing = inchesToPoints(bingoPageConfig.getHeaderSpacingLeftInches());
 
         float width = pd.width() - rightSpacing - leftSpacing;
         float height = header.getHeight();
@@ -84,7 +84,7 @@ public class LayoutCalculator {
     }
 
     public static GridLayout drawGrid (
-            PdfDocument document, CardConfig config, PageDimensions pd, float headerHeight, boolean dotted
+            PdfDocument document, PageConfig config, PageDimensions pd, float headerHeight, boolean dotted
     ) {
         float lineWidth = inchesToPoints(config.getGridLineThicknessInches());
         float lineWidthOffset = lineWidth / 2;
@@ -100,8 +100,8 @@ public class LayoutCalculator {
         float gridHeight = pd.height() - headerSpacingTop - headerHeight - headerSpacingBottom - gridSpacingBottom;
 
         // iText positions lines based on their centers, so lines with variable width need to be offset
-        int rows = config.getRows();
-        int columns = config.getColumns();
+        int rows = config.getGridRowAmount();
+        int columns = config.getGridColumnAmount();
         float cellWidth = (gridWidth - lineWidth) / columns;
         float cellHeight = (gridHeight - lineWidth) / rows;
 
@@ -119,7 +119,7 @@ public class LayoutCalculator {
                     .lineTo(j * cellWidth + lineWidthOffset, gridHeight - lineWidthOffset);
         }
 
-        gridCanvas.setStrokeColor(config.getGridColor());
+        gridCanvas.setStrokeColor(config.getGridLineColor());
         if (dotted) {
             gridCanvas.setLineDash(3f, 3f);
         }
@@ -140,12 +140,12 @@ public class LayoutCalculator {
     }
 
     public static XObjectTransform getGridTransform(
-            CardConfig bingoCardConfig,
+            PageConfig bingoPageConfig,
             PageDimensions pd,
             float xOffset
     ) {
-        float spacingBottom = inchesToPoints(bingoCardConfig.getGridSpacingBottomInches());
-        float spacingLeft = inchesToPoints(bingoCardConfig.getGridSpacingLeftInches());
+        float spacingBottom = inchesToPoints(bingoPageConfig.getGridSpacingBottomInches());
+        float spacingLeft = inchesToPoints(bingoPageConfig.getGridSpacingLeftInches());
 
         float gridX = pd.marginLeft() + spacingLeft + xOffset;
         float gridY = pd.marginBottom() + spacingBottom;
@@ -161,16 +161,16 @@ public class LayoutCalculator {
     }
 
     public static void addImagesAndLabelsToGrid(
-            CardConfig config,
+            PageConfig config,
             GridLayout gridLayout,
             XObjectTransform gridTransform,
             List<String> permutation,
-            Map<String, BingoSquare> bingoSquares,
+            Map<String, GridContent> bingoSquares,
             PdfFormXObject freeSpace,
             PdfCanvas canvas
     ) {
-        int rows = config.getRows();
-        int cols = config.getColumns();
+        int rows = config.getGridRowAmount();
+        int cols = config.getGridColumnAmount();
         float cellWidth = gridLayout.cellWidth();
         float cellHeight = gridLayout.cellHeight();
         float cellPaddingY = gridLayout.cellPaddingY();
@@ -232,14 +232,14 @@ public class LayoutCalculator {
     }
 
     public static void addTokensToGrid(
-            CardConfig config,
+            PageConfig config,
             GridLayout gridLayout,
             XObjectTransform gridTransform,
             PdfFormXObject token,
             PdfCanvas canvas
     ) {
-        int rows = config.getRows();
-        int cols = config.getColumns();
+        int rows = config.getGridRowAmount();
+        int cols = config.getGridColumnAmount();
         float cellWidth = gridLayout.cellWidth();
         float cellHeight = gridLayout.cellHeight();
         float cellPaddingY = gridLayout.cellPaddingY();

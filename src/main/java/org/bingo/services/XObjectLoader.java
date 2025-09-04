@@ -12,7 +12,7 @@ import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
-import org.bingo.model.BingoSquare;
+import org.bingo.model.GridContent;
 import org.bingo.model.GridLayout;
 
 import java.nio.file.Path;
@@ -33,12 +33,12 @@ public class XObjectLoader {
         return image;
     }
 
-    public static Map<String, BingoSquare> loadImageDirectory(Path resourceDir, PdfDocument document,GridLayout gl, PdfFont font, DeviceRgb color) throws IOException {
+    public static Map<String, GridContent> loadImageDirectory(Path resourceDir, PdfDocument document, GridLayout gl, PdfFont font, DeviceRgb color) throws IOException {
         if (!Files.isDirectory(resourceDir) || Files.notExists(resourceDir)) {
             throw new IOException("Resource directory does not exist: " + resourceDir);
         }
 
-        Map<String, BingoSquare> bingoIcons = new HashMap<>();
+        Map<String, GridContent> bingoIcons = new HashMap<>();
 
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(resourceDir, "*.png")) {
             for (Path path : directoryStream) {
@@ -51,7 +51,7 @@ public class XObjectLoader {
                     labelObject = loadLabel(label, gl, document, font, color);
                 }
                 PdfFormXObject iconObject = loadImage(path, document);
-                bingoIcons.put(label, new BingoSquare(labelObject, iconObject));
+                bingoIcons.put(label, new GridContent(labelObject, iconObject));
             }
         }
         return bingoIcons;
