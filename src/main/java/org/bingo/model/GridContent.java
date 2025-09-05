@@ -1,5 +1,16 @@
 package org.bingo.model;
 
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
 
-public record GridContent(PdfFormXObject label, PdfFormXObject icon) {}
+/**
+ * Container for labels and icons that populate grid cells
+ */
+@Data
+@Builder
+public class GridContent {
+        PdfFormXObject label;
+        @NonNull PdfFormXObject icon;
+}

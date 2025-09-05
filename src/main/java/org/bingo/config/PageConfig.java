@@ -1,4 +1,4 @@
-package org.bingo.model;
+package org.bingo.config;
 
 import lombok.Builder;
 import lombok.Data;

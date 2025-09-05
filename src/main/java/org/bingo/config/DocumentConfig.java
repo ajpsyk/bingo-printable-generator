@@ -1,4 +1,4 @@
-package org.bingo.model;
+package org.bingo.config;
 
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
@@ -16,7 +16,8 @@ import lombok.NonNull;
 @Data
 @Builder(toBuilder = true)
 public class DocumentConfig {
-    @NonNull AssetPaths assets;
+    @NonNull
+    AssetPaths assets;
     @NonNull Path outputPath;
 
     @Builder.Default DeviceRgb fontColor = new DeviceRgb(0,0,0);

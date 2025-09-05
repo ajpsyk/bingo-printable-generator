@@ -5,15 +5,15 @@ package org.bingo;
 
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
-import org.bingo.model.AssetPaths;
+import org.bingo.config.AssetPaths;
 import org.bingo.services.DocumentBuilder;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.bingo.model.DocumentConfig;
-import org.bingo.model.PageConfig;
+import org.bingo.config.DocumentConfig;
+import org.bingo.config.PageConfig;
 
 public class App {
 
@@ -53,6 +53,8 @@ public class App {
             DocumentConfig twoPerPageBingoCards = onePerPageBingoCards.toBuilder()
                     .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
                     .pageSize(PageSize.LETTER.rotate())
+                    .marginTopInches(0.625f)
+                    .marginBottomInches(0.625f)
                     .build();
 
             DocumentConfig instructionsTokensCallingCards = onePerPageBingoCards.toBuilder()
@@ -78,7 +80,7 @@ public class App {
                     .copies(100)
                     .build();
 
-            PageConfig landScapeBingo = portraitBingo.toBuilder()
+            PageConfig landscapeBingo = portraitBingo.toBuilder()
                     .build();
 
             PageConfig tokens = portraitBingo.toBuilder()
@@ -105,7 +107,6 @@ public class App {
                     .gridSpacingRightInches(0f)
                     .gridSpacingLeftInches(0f)
                     .gridSpacingBottomInches(0f)
-                    .gridSpacingRightInches(0f)
                     .build();
 
             PageConfig multiCallingCardsConfig = callingCardsSinglePage.toBuilder()
@@ -118,7 +119,7 @@ public class App {
                     .build();
 
             DocumentBuilder.buildOnePerPageBingoCards(onePerPageBingoCards, portraitBingo);
-            DocumentBuilder.buildTwoPerPageBingoCards(twoPerPageBingoCards, landScapeBingo);
+            DocumentBuilder.buildTwoPerPageBingoCards(twoPerPageBingoCards, landscapeBingo);
             DocumentBuilder.buildInstructionsTokensCallingCards(instructionsTokensCallingCards,
                     tokens, callingCardsSinglePage,
                     multiCallingCardsConfig, multiCallingLastCardsConfig

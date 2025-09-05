@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-public class BingoSquareShuffler {
-    public static List<List<String>> getUniquePermutations(List<String> imageLabels, int numPermutations, long seed) {
+public class Shuffler {
+    public static List<List<String>> getUniquePermutations(List<String> imageLabels, int numPermutations, Random seed) {
         Set<List<String>> uniquePermutations = new HashSet<>();
-        Random randomSeed = new Random(1);
         while (uniquePermutations.size() < numPermutations) {
             List<String> permutation = new ArrayList<>(imageLabels);
-            Collections.shuffle(permutation, randomSeed);
+            Collections.shuffle(permutation, seed);
             uniquePermutations.add(permutation);
         }
         return new ArrayList<>(uniquePermutations);
