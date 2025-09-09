@@ -16,8 +16,7 @@ import lombok.NonNull;
 @Data
 @Builder(toBuilder = true)
 public class DocumentConfig {
-    @NonNull
-    AssetPaths assets;
+    @NonNull AssetPaths assets;
     @NonNull Path outputPath;
 
     @Builder.Default DeviceRgb fontColor = new DeviceRgb(0,0,0);

@@ -28,117 +28,113 @@ public class DocumentBuilder {
             DocumentConfig docConfig,
             PageConfig pageConfig
     ) throws FileNotFoundException {
+        String outputPath = docConfig.getOutputPath().toString();
+        try (PdfDocument doc = new PdfDocument(new PdfWriter(outputPath))) {
+            PageLayout pl = getPageDimensions(docConfig);
+            AssetPaths assets = docConfig.getAssets();
 
-        PdfDocument doc;
-        Path outputPath = docConfig.getOutputPath();
-        try {
-            doc = new PdfDocument(new PdfWriter(outputPath.toString()));
+            int cardAmount = pageConfig.getCopies();
+
+            Frame frame = ObjectBuilder.getFrame(doc, pl, assets.getFramePath());
+            Header header =  ObjectBuilder.getHeader(doc, pl, assets.getHeaderPath(), pageConfig);
+            Grid grid = ObjectBuilder.getGrid(doc, pageConfig, pl, header.getHeight(), false);
+
+            PdfFormXObject freeSpace = ObjectBuilder.loadImage(assets.getFreeSpacePath(), doc);
+
+            Map<String, GridContent> bingoSquares = ObjectBuilder.loadImageDirectory(
+                    assets.getIconsPath(), doc, grid, createFont(assets.getFontPath()), docConfig.getFontColor()
+            );
+            List<List<String>> permutations = Shuffler.getUniquePermutations(
+                    new ArrayList<>(bingoSquares.keySet()), cardAmount, docConfig.getSeed()
+            );
+
+            IntStream.range(0, cardAmount).forEach(i -> {
+                PdfPage page = doc.addNewPage(docConfig.getPageSize());
+                PdfCanvas canvas = new PdfCanvas(page);
+
+                addToDocument(canvas, frame.getObject(), frame.getTransform());
+                addToDocument(canvas, header.getObject(), header.getTransform());
+                addToDocument(canvas, grid.getObject(), grid.getTransform());
+
+                List<String> permutation = permutations.get(i);
+                ObjectBuilder.addImagesAndLabelsToGrid(
+                        pageConfig, grid, permutation, bingoSquares, freeSpace, canvas
+                );
+            });
         } catch (IOException e) {
             throw new FileNotFoundException("Output path is invalid or not writable: " + outputPath);
         }
-
-        PageLayout pl = getPageDimensions(docConfig);
-        AssetPaths assets = docConfig.getAssets();
-
-        int cardAmount = pageConfig.getCopies();
-
-        Frame frame = ObjectBuilder.getFrame(doc, pl, assets.getFramePath());
-        Header header =  ObjectBuilder.getHeader(doc, pl, assets.getHeaderPath(), pageConfig);
-        Grid grid = ObjectBuilder.getGrid(doc, pageConfig, pl, header.getHeight(), false);
-
-        PdfFormXObject freeSpace = ObjectBuilder.loadImage(assets.getFreeSpacePath(), doc);
-
-        Map<String, GridContent> bingoSquares = ObjectBuilder.loadImageDirectory(
-                assets.getIconsPath(), doc, grid, createFont(assets.getFontPath()), docConfig.getFontColor()
-        );
-        List<List<String>> permutations = Shuffler.getUniquePermutations(
-                new ArrayList<>(bingoSquares.keySet()), cardAmount, docConfig.getSeed()
-        );
-
-        IntStream.range(0, cardAmount).forEach(i -> {
-            PdfPage page = doc.addNewPage(docConfig.getPageSize());
-            PdfCanvas canvas = new PdfCanvas(page);
-
-            addToDocument(canvas, frame.getObject(), frame.getTransform());
-            addToDocument(canvas, header.getObject(), header.getTransform());
-            addToDocument(canvas, grid.getObject(), grid.getTransform());
-
-            List<String> permutation = permutations.get(i);
-            ObjectBuilder.addImagesAndLabelsToGrid(
-                    pageConfig, grid, permutation, bingoSquares, freeSpace, canvas
-            );
-        });
-
-
-        doc.close();
     }
 
     public static void buildTwoPerPageBingoCards (
             DocumentConfig docConfig, PageConfig pageConfig
-    ) throws IOException {
-        PdfDocument doc = new PdfDocument(new PdfWriter(docConfig.getOutputPath().toString()));
-        PageLayout pl = getPageDimensions(docConfig);
-        float xOffset = pl.getMarginLeft() + pl.getMarginRight() + pl.getPrintSafeWidth();
-        AssetPaths assets = docConfig.getAssets();
+    ) throws FileNotFoundException {
+        String outputPath = docConfig.getOutputPath().toString();
+        try (PdfDocument doc = new PdfDocument(new PdfWriter(outputPath))) {
+            PageLayout pl = getPageDimensions(docConfig);
+            float xOffset = pl.getMarginLeft() + pl.getMarginRight() + pl.getPrintSafeWidth();
+            AssetPaths assets = docConfig.getAssets();
 
-        int cardAmount = pageConfig.getCopies();
+            int cardAmount = pageConfig.getCopies();
 
-        Frame frame = ObjectBuilder.getFrame(doc, pl, assets.getFramePath());
-        Frame offsetFrame = frame.toBuilder()
-                .transform(frame.getTransform().toBuilder()
-                        .positionX(frame.getTransform().getPositionX() + xOffset)
-                        .build())
-                .build();;
+            Frame frame = ObjectBuilder.getFrame(doc, pl, assets.getFramePath());
+            Frame offsetFrame = frame.toBuilder()
+                    .transform(frame.getTransform().toBuilder()
+                            .positionX(frame.getTransform().getPositionX() + xOffset)
+                            .build())
+                    .build();
 
-        Header header =  ObjectBuilder.getHeader(doc, pl,  assets.getHeaderPath(), pageConfig);
-        Header offsetHeader = header.toBuilder()
-                .transform(header.getTransform().toBuilder()
-                        .positionX(header.getTransform().getPositionX() + xOffset)
-                        .build())
-                .build();
+            Header header = ObjectBuilder.getHeader(doc, pl, assets.getHeaderPath(), pageConfig);
+            Header offsetHeader = header.toBuilder()
+                    .transform(header.getTransform().toBuilder()
+                            .positionX(header.getTransform().getPositionX() + xOffset)
+                            .build())
+                    .build();
 
-        PdfFormXObject freeSpace = ObjectBuilder.loadImage(assets.getFreeSpacePath(), doc);
+            PdfFormXObject freeSpace = ObjectBuilder.loadImage(assets.getFreeSpacePath(), doc);
 
-        Grid grid = ObjectBuilder.getGrid(doc, pageConfig, pl, header.getHeight(), false);
-        Grid offsetGrid = grid.toBuilder()
-                .transform(grid.getTransform().toBuilder()
-                        .positionX(grid.getTransform().getPositionX() + xOffset)
-                        .build())
-                .build();
+            Grid grid = ObjectBuilder.getGrid(doc, pageConfig, pl, header.getHeight(), false);
+            Grid offsetGrid = grid.toBuilder()
+                    .transform(grid.getTransform().toBuilder()
+                            .positionX(grid.getTransform().getPositionX() + xOffset)
+                            .build())
+                    .build();
 
-        Map<String, GridContent> bingoSquares = ObjectBuilder.loadImageDirectory(
-                assets.getIconsPath(), doc, grid, createFont(assets.getFontPath()), docConfig.getFontColor()
-        );
-        List<List<String>> permutations = Shuffler.getUniquePermutations(
-                new ArrayList<>(bingoSquares.keySet()), cardAmount, docConfig.getSeed()
-        );
-        IntStream.range(0, cardAmount / 2).forEach(i -> {
-            PdfPage page = doc.addNewPage(PageSize.LETTER.rotate());
-            PdfCanvas canvas = new PdfCanvas(page);
-
-            addToDocument(canvas, frame.getObject(), frame.getTransform());
-            addToDocument(canvas, offsetFrame.getObject(), offsetFrame.getTransform());
-
-            addToDocument(canvas, header.getObject(), header.getTransform());
-            addToDocument(canvas, offsetHeader.getObject(), offsetHeader.getTransform());
-
-            addToDocument(canvas, grid.getObject(), grid.getTransform());
-            addToDocument(canvas, offsetGrid.getObject(), offsetGrid.getTransform());
-
-
-            List<String> leftPermutation = permutations.get(i * 2);
-            ObjectBuilder.addImagesAndLabelsToGrid(
-                    pageConfig, grid, leftPermutation, bingoSquares, freeSpace, canvas
+            Map<String, GridContent> bingoSquares = ObjectBuilder.loadImageDirectory(
+                    assets.getIconsPath(), doc, grid, createFont(assets.getFontPath()), docConfig.getFontColor()
             );
-
-            List<String> rightPermutation = permutations.get(i * 2 + 1);
-            ObjectBuilder.addImagesAndLabelsToGrid(
-                    pageConfig, offsetGrid, rightPermutation, bingoSquares, freeSpace, canvas
+            List<List<String>> permutations = Shuffler.getUniquePermutations(
+                    new ArrayList<>(bingoSquares.keySet()), cardAmount, docConfig.getSeed()
             );
+            IntStream.range(0, cardAmount / 2).forEach(i -> {
+                PdfPage page = doc.addNewPage(PageSize.LETTER.rotate());
+                PdfCanvas canvas = new PdfCanvas(page);
 
-        });
+                addToDocument(canvas, frame.getObject(), frame.getTransform());
+                addToDocument(canvas, offsetFrame.getObject(), offsetFrame.getTransform());
 
-        doc.close();
+                addToDocument(canvas, header.getObject(), header.getTransform());
+                addToDocument(canvas, offsetHeader.getObject(), offsetHeader.getTransform());
+
+                addToDocument(canvas, grid.getObject(), grid.getTransform());
+                addToDocument(canvas, offsetGrid.getObject(), offsetGrid.getTransform());
+
+
+                List<String> leftPermutation = permutations.get(i * 2);
+                ObjectBuilder.addImagesAndLabelsToGrid(
+                        pageConfig, grid, leftPermutation, bingoSquares, freeSpace, canvas
+                );
+
+                List<String> rightPermutation = permutations.get(i * 2 + 1);
+                ObjectBuilder.addImagesAndLabelsToGrid(
+                        pageConfig, offsetGrid, rightPermutation, bingoSquares, freeSpace, canvas
+                );
+
+            });
+        } catch (IOException e) {
+                throw new FileNotFoundException("Output path is invalid or not writable: " + outputPath);
+        }
+
     }
 
     public static void buildInstructionsTokensCallingCards (
@@ -147,87 +143,99 @@ public class DocumentBuilder {
             PageConfig ccConfig,
             PageConfig multiCallingCardsConfig,
             PageConfig multiCallingLastCardsConfig
-    ) throws IOException {
+    ) throws FileNotFoundException {
 
         AssetPaths assets = docConfig.getAssets();
-        PdfDocument doc = new PdfDocument(
+        String outputPath = docConfig.getOutputPath().toString();
+        try (PdfDocument doc = new PdfDocument(
                 new PdfReader(assets.getInstructionsPath().toString()),
-                new PdfWriter(docConfig.getOutputPath().toString())
-        );
-        PageLayout pl = getPageDimensions(docConfig);
+                new PdfWriter(outputPath)
+        )) {
+            PageLayout pl = getPageDimensions(docConfig);
 
-        // Tokens
-        PdfPage page = doc.addNewPage(docConfig.getPageSize());
-        PdfCanvas canvas = new PdfCanvas(page);
+            // Tokens
+            PdfPage page = doc.addNewPage(docConfig.getPageSize());
+            PdfCanvas canvas = new PdfCanvas(page);
 
-        Header scissors = ObjectBuilder.getHeader(doc, pl, assets.getScissorsIconPath(), tokenConfig);
-        Grid grid = ObjectBuilder.getGrid(doc, tokenConfig, pl, scissors.getHeight(), true);
-        PdfFormXObject token = ObjectBuilder.loadImage(assets.getTokenPath(), doc);
+            Header scissors = ObjectBuilder.getHeader(doc, pl, assets.getScissorsIconPath(), tokenConfig);
+            Grid grid = ObjectBuilder.getGrid(doc, tokenConfig, pl, scissors.getHeight(), true);
+            PdfFormXObject token = ObjectBuilder.loadImage(assets.getTokenPath(), doc);
 
-        addToDocument(canvas, scissors.getObject(), scissors.getTransform());
-        addToDocument(canvas, grid.getObject(), grid.getTransform());
-        ObjectBuilder.addTokensToGrid(tokenConfig, grid, token, canvas);
+            addToDocument(canvas, scissors.getObject(), scissors.getTransform());
+            addToDocument(canvas, grid.getObject(), grid.getTransform());
+            ObjectBuilder.addTokensToGrid(tokenConfig, grid, token, canvas);
 
 
-        // Calling Cards Single
-        PdfPage page2 = doc.addNewPage(docConfig.getPageSize());
-        PdfCanvas canvas2 = new PdfCanvas(page2);
+            // Calling Cards Single
+            PdfPage page2 = doc.addNewPage(docConfig.getPageSize());
+            PdfCanvas canvas2 = new PdfCanvas(page2);
 
-        Header callingCardsHeader = ObjectBuilder.getHeader(doc, pl, assets.getCallingCardsHeaderPath(), ccConfig);
-        Grid ccGrid = ObjectBuilder.getGrid(
-                doc, ccConfig, pl, callingCardsHeader.getHeight(), false
-        );
-        Map<String, GridContent> ccSquares = ObjectBuilder.loadImageDirectory(
-                assets.getIconsPath(), doc, ccGrid, createFont(assets.getFontPath()), docConfig.getFontColor()
-        );
-        List<String> labelsInOrder = new ArrayList<>(ccSquares.keySet());
-        labelsInOrder.sort(Comparator.naturalOrder());
-
-        addToDocument(canvas2, callingCardsHeader.getObject(), callingCardsHeader.getTransform());
-        addToDocument(canvas2, ccGrid.getObject(), ccGrid.getTransform());
-        ObjectBuilder.addImagesAndLabelsToGrid(ccConfig, ccGrid, labelsInOrder, ccSquares, null, canvas2);
-
-        // Calling Cards Multi
-        Grid multiGrid = ObjectBuilder.getGrid(
-                doc, multiCallingCardsConfig, pl, scissors.getHeight(), true
-        );
-        Map<String, GridContent> multiSquares = ObjectBuilder.loadImageDirectory(
-                assets.getIconsPath(), doc, multiGrid, createFont(assets.getFontPath()), docConfig.getFontColor()
-        );
-        for (int i = 0; i < 7; i++) {
-            PdfPage page3 = doc.addNewPage(docConfig.getPageSize());
-            PdfCanvas canvas3 = new PdfCanvas(page3);
-
-            addToDocument(canvas3, scissors.getObject(), scissors.getTransform());
-            addToDocument(canvas3, multiGrid.getObject(), multiGrid.getTransform());
-            ObjectBuilder.addImagesAndLabelsToGrid(
-                    multiCallingCardsConfig,
-                    multiGrid,
-                    labelsInOrder.subList(i * 4, i * 4 + 4),
-                    multiSquares,
-                    null,
-                    canvas3
+            Header callingCardsHeader = ObjectBuilder.getHeader(doc, pl, assets.getCallingCardsHeaderPath(), ccConfig);
+            Grid ccGrid = ObjectBuilder.getGrid(
+                    doc, ccConfig, pl, callingCardsHeader.getHeight(), false
             );
+            Map<String, GridContent> ccSquares = ObjectBuilder.loadImageDirectory(
+                    assets.getIconsPath(), doc, ccGrid, createFont(assets.getFontPath()), docConfig.getFontColor()
+            );
+            List<String> labelsInOrder = new ArrayList<>(ccSquares.keySet());
+            labelsInOrder.sort(Comparator.naturalOrder());
+
+            addToDocument(canvas2, callingCardsHeader.getObject(), callingCardsHeader.getTransform());
+            addToDocument(canvas2, ccGrid.getObject(), ccGrid.getTransform());
+            ObjectBuilder.addImagesAndLabelsToGrid(ccConfig, ccGrid, labelsInOrder, ccSquares, null, canvas2);
+
+            // Calling Cards Multi
+            Grid multiGrid = ObjectBuilder.getGrid(
+                    doc, multiCallingCardsConfig, pl, scissors.getHeight(), true
+            );
+            Map<String, GridContent> multiSquares = ObjectBuilder.loadImageDirectory(
+                    assets.getIconsPath(), doc, multiGrid, createFont(assets.getFontPath()), docConfig.getFontColor()
+            );
+
+            int iconsPerPage = 4;
+            int totalIcons = labelsInOrder.size();
+            int fullPages = totalIcons / iconsPerPage;
+            int remaining = totalIcons % iconsPerPage;
+
+            IntStream.range(0, fullPages).forEach(i -> {
+                int start = i * iconsPerPage;
+                int end = start + iconsPerPage;
+
+                PdfPage page3 = doc.addNewPage(docConfig.getPageSize());
+                PdfCanvas canvas3 = new PdfCanvas(page3);
+
+                addToDocument(canvas, scissors.getObject(), scissors.getTransform());
+                addToDocument(canvas, multiGrid.getObject(), multiGrid.getTransform());
+                ObjectBuilder.addImagesAndLabelsToGrid(
+                        multiCallingCardsConfig,
+                        multiGrid,
+                        labelsInOrder.subList(start, end),
+                        multiSquares,
+                        null,
+                        canvas3
+                );
+            });
+
+            if (remaining > 0) {
+                int start = fullPages * iconsPerPage;
+                PdfPage page4 = doc.addNewPage(docConfig.getPageSize());
+                PdfCanvas canvas4 = new PdfCanvas(page4);
+                Grid lastGrid = ObjectBuilder.getGrid(doc, multiCallingLastCardsConfig, pl, scissors.getHeight(), true);
+
+                addToDocument(canvas, scissors.getObject(), scissors.getTransform());
+                addToDocument(canvas, lastGrid.getObject(), lastGrid.getTransform());
+                ObjectBuilder.addImagesAndLabelsToGrid(
+                        multiCallingLastCardsConfig,
+                        lastGrid,
+                        labelsInOrder.subList(start, totalIcons),
+                        multiSquares,
+                        null,
+                        canvas4
+                );
+            }
+        } catch (IOException e) {
+            throw new FileNotFoundException("Output path is invalid or not writable: " + outputPath);
         }
-
-        PdfPage page4 = doc.addNewPage(docConfig.getPageSize());
-        PdfCanvas canvas4 = new PdfCanvas(page4);
-        Grid multiGridLastPage =  ObjectBuilder.getGrid(
-                doc, multiCallingLastCardsConfig, pl, scissors.getHeight(), true
-        );
-
-        addToDocument(canvas4, scissors.getObject(), scissors.getTransform());
-        addToDocument(canvas4, multiGridLastPage.getObject(), multiGridLastPage.getTransform());
-        ObjectBuilder.addImagesAndLabelsToGrid(
-                multiCallingLastCardsConfig,
-                multiGridLastPage,
-                labelsInOrder.subList(28, 30),
-                multiSquares,
-                null,
-                canvas4
-        );
-
-        doc.close();
     }
 
     public static PageLayout getPageDimensions(
@@ -256,7 +264,6 @@ public class DocumentBuilder {
                 .marginLeft(marginLeft)
                 .build();
     }
-
 
     public static void addToDocument(
             PdfCanvas canvas, PdfFormXObject object, Transform transform

@@ -19,7 +19,7 @@ public class App {
 
     public static void main(String[] args) {
         try {
-            String THEME_NAME = "Dark Academia";
+            String THEME_NAME = "Wedding";
             Path output = Paths.get("output");
             Path resources = Paths.get("resources");
             Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_1PerPage.pdf");
@@ -43,7 +43,7 @@ public class App {
             DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
                     .assets(onePerPageBingoPaths)
                     .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
-                    .fontColor(new DeviceRgb(88, 26, 77))
+                    .fontColor(new DeviceRgb(55, 52, 52))
                     .marginTopInches(0.25f)
                     .marginBottomInches(0.25f)
                     .marginLeftInches(0.25f)
@@ -62,25 +62,31 @@ public class App {
                     .build();
 
             PageConfig portraitBingo = PageConfig.builder()
-                    .headerSpacingTopInches(0.3f)
+                    .headerSpacingTopInches(0.2f)
                     .headerSpacingRightInches(0.3f)
-                    .headerSpacingBottomInches(0.3f)
+                    .headerSpacingBottomInches(0.05f)
                     .headerSpacingLeftInches(0.3f)
-                    .gridLineColor(new DeviceRgb(125, 96, 85))
+                    .gridLineColor(new DeviceRgb(94, 94, 94))
                     .gridRowAmount(5)
                     .gridColumnAmount(5)
-                    .gridLineThicknessInches(0.0018f)
-                    .gridSpacingRightInches(0.3f)
-                    .gridSpacingLeftInches(0.3f)
-                    .gridSpacingBottomInches(0.3f)
+                    .gridLineThicknessInches(0.014f)
+                    .gridSpacingRightInches(0.35f)
+                    .gridSpacingLeftInches(0.35f)
+                    .gridSpacingBottomInches(0.375f)
                     .labelHeightRatio(0.14f)
                     .cellSpacingXRatio(0.05f)
                     .cellSpacingYRatio(0.05f)
                     .cellGapRatio(0.05f)
-                    .copies(100)
+                    .copies(200)
                     .build();
 
             PageConfig landscapeBingo = portraitBingo.toBuilder()
+                    .labelHeightRatio(.12f)
+                    .headerSpacingTopInches(0.15f)
+                    .gridSpacingRightInches(0.225f)
+                    .gridSpacingLeftInches(0.225f)
+                    .gridSpacingBottomInches(0.25f)
+                    .gridLineThicknessInches(0.007f)
                     .build();
 
             PageConfig tokens = portraitBingo.toBuilder()
@@ -90,18 +96,20 @@ public class App {
                     .copies(1)
                     .headerSpacingTopInches(0f)
                     .headerSpacingLeftInches(0f)
+                    .headerSpacingBottomInches(0.2f)
                     .gridSpacingBottomInches(0f)
                     .gridSpacingRightInches(0f)
                     .gridSpacingLeftInches(0f)
                     .headerSpacingRightInches(6.8f)
                     .labelHeightRatio(0)
+                    .cellSpacingXRatio(0.1f)
                     .build();
 
             PageConfig callingCardsSinglePage = portraitBingo.toBuilder()
                     .gridRowAmount(6)
                     .gridColumnAmount(5)
                     .copies(1)
-                    .gridLineThicknessInches(0.022f)
+                    .gridLineThicknessInches(0.014f)
                     .headerSpacingTopInches(0f)
                     .headerSpacingBottomInches(0.1f)
                     .gridSpacingRightInches(0f)
@@ -112,10 +120,14 @@ public class App {
             PageConfig multiCallingCardsConfig = callingCardsSinglePage.toBuilder()
                     .gridRowAmount(2)
                     .gridColumnAmount(2)
+                    .headerSpacingBottomInches(0.2f)
+                    .labelHeightRatio(0.12f)
+                    .gridLineThicknessInches(0.01f)
                     .build();
 
             PageConfig multiCallingLastCardsConfig = multiCallingCardsConfig.toBuilder()
                     .gridRowAmount(1)
+                    .gridSpacingBottomInches(4.7f)
                     .build();
 
             DocumentBuilder.buildOnePerPageBingoCards(onePerPageBingoCards, portraitBingo);
