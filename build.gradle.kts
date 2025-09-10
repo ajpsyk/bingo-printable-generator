@@ -7,42 +7,45 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
     application
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
 dependencies {
-    // This dependency is used by the application.
     implementation(libs.itextKernel)
     implementation(libs.itextIO)
     implementation(libs.itextSVG)
+
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
 }
 
+javafx {
+    version = "24.0.2"
+    modules = listOf("javafx.controls")
+}
+
 testing {
     suites {
-        // Configure the built-in test suite
         val test by getting(JvmTestSuite::class) {
-            // Use JUnit Jupiter test framework
             useJUnitJupiter("5.12.1")
         }
     }
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(24)
     }
 }
 
 application {
-    // Define the main class for the application.
-    mainClass = "org.bingo.App"
+    mainClass = "org.bingo.ui.Main"
+    applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=javafx.graphics"
+    )
 }
