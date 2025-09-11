@@ -204,8 +204,8 @@ public class DocumentBuilder {
                 PdfPage page3 = doc.addNewPage(docConfig.getPageSize());
                 PdfCanvas canvas3 = new PdfCanvas(page3);
 
-                addToDocument(canvas, scissors.getObject(), scissors.getTransform());
-                addToDocument(canvas, multiGrid.getObject(), multiGrid.getTransform());
+                addToDocument(canvas3, scissors.getObject(), scissors.getTransform());
+                addToDocument(canvas3, multiGrid.getObject(), multiGrid.getTransform());
                 ObjectBuilder.addImagesAndLabelsToGrid(
                         multiCallingCardsConfig,
                         multiGrid,
@@ -222,8 +222,8 @@ public class DocumentBuilder {
                 PdfCanvas canvas4 = new PdfCanvas(page4);
                 Grid lastGrid = ObjectBuilder.getGrid(doc, multiCallingLastCardsConfig, pl, scissors.getHeight(), true);
 
-                addToDocument(canvas, scissors.getObject(), scissors.getTransform());
-                addToDocument(canvas, lastGrid.getObject(), lastGrid.getTransform());
+                addToDocument(canvas4, scissors.getObject(), scissors.getTransform());
+                addToDocument(canvas4, lastGrid.getObject(), lastGrid.getTransform());
                 ObjectBuilder.addImagesAndLabelsToGrid(
                         multiCallingLastCardsConfig,
                         lastGrid,

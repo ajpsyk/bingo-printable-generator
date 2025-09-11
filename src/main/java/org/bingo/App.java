@@ -19,7 +19,7 @@ public class App {
 
     public static void main(String[] args) {
         try {
-            String THEME_NAME = "Wedding";
+            String THEME_NAME = "Woodland";
             Path output = Paths.get("output");
             Path resources = Paths.get("resources");
             Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_1PerPage.pdf");
@@ -43,7 +43,7 @@ public class App {
             DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
                     .assets(onePerPageBingoPaths)
                     .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
-                    .fontColor(new DeviceRgb(55, 52, 52))
+                    .fontColor(new DeviceRgb(73, 77, 58))
                     .marginTopInches(0.25f)
                     .marginBottomInches(0.25f)
                     .marginLeftInches(0.25f)
@@ -62,11 +62,11 @@ public class App {
                     .build();
 
             PageConfig portraitBingo = PageConfig.builder()
-                    .headerSpacingTopInches(0.2f)
+                    .headerSpacingTopInches(0.3f)
                     .headerSpacingRightInches(0.3f)
                     .headerSpacingBottomInches(0.05f)
                     .headerSpacingLeftInches(0.3f)
-                    .gridLineColor(new DeviceRgb(94, 94, 94))
+                    .gridLineColor(new DeviceRgb(91, 79, 69))
                     .gridRowAmount(5)
                     .gridColumnAmount(5)
                     .gridLineThicknessInches(0.014f)
@@ -82,11 +82,13 @@ public class App {
 
             PageConfig landscapeBingo = portraitBingo.toBuilder()
                     .labelHeightRatio(.12f)
-                    .headerSpacingTopInches(0.15f)
+                    .headerSpacingTopInches(0.2f)
+                    .headerSpacingBottomInches(0.025f)
                     .gridSpacingRightInches(0.225f)
                     .gridSpacingLeftInches(0.225f)
-                    .gridSpacingBottomInches(0.25f)
+                    .gridSpacingBottomInches(0.27f)
                     .gridLineThicknessInches(0.007f)
+                    .cellSpacingXRatio(0.10f)
                     .build();
 
             PageConfig tokens = portraitBingo.toBuilder()

@@ -2,17 +2,16 @@ package org.bingo.ui;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
 
 public class Main extends Application {
 
@@ -29,64 +28,186 @@ public class Main extends Application {
         // Tabs
         Tab generalTab = new Tab("Assets");
 
-// Main container
-        HBox row = new HBox();
-        row.setPadding(new Insets(15));
-        row.setSpacing(10); // gap between label column and field column
+        // Main container
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(15));
+        grid.setHgap(10);
+        grid.setVgap(10);
 
-// Column 1: labels
-        VBox labelsColumn = new VBox(10); // vertical spacing
-        labelsColumn.setAlignment(Pos.TOP_RIGHT);
-        labelsColumn.setPrefWidth(150); // fixed width so all fields start aligned
-        labelsColumn.getChildren().addAll(
-                new Label("Theme Name:"),
-                new Label("Output Directory:"),
-                new Label("Bingo Images:"),
-                new Label("Bingo Header Image:"),
-                new Label("Frame Image:"),
-                new Label("Free Space Image:"),
-                new Label("Calling Cards Header:"),
-                new Label("Token Image:"),
-                new Label("Instructions Path:"),
-                new Label("Font Path:"),
-                new Label("Scissors Image Path:")
-        );
+        int row = 0;
 
-// Column 2: fields
-        VBox fieldsColumn = new VBox(10);
-        fieldsColumn.getChildren().addAll(
-                new TextField(), // Theme Name
-                new TextField(), // Output Directory
-                new TextField(), // Bingo Images
-                new TextField(), // Bingo Header Image
-                new TextField(), // Frame Image
-                new TextField(), // Free Space Image
-                new TextField(), // Calling Cards Header
-                new TextField(), // Token Image
-                new TextField(), // Instructions Path
-                new TextField(), // Font Path
-                new TextField()  // Scissors Image Path
-        );
+        // Group 1: Theme Name
+        grid.add(new Label("Theme Name:"), 0, row);
+        grid.add(new TextField(), 1, row);
+        GridPane.setMargin(grid.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid.getChildren().get(grid.getChildren().size() - 2), new Insets(0,0,20,0));
+        row += 1;
 
-// Add columns to HBox
-        row.getChildren().addAll(labelsColumn, fieldsColumn);
-        generalTab.setContent(row);
+        grid.add(new Label("Grid Color:"), 0, row);
+        grid.add(new TextField(), 1, row);
+        row += 1;
+        grid.add(new Label("Label Color:"), 0, row);
+        grid.add(new TextField(), 1, row);
+        GridPane.setMargin(grid.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid.getChildren().get(grid.getChildren().size() - 2), new Insets(0,0,20,0));
+        row += 1;
 
-        // field for frame path
-        // field for header path
-        // filed for icons path
-        // field for freespace path
-        // field for token path
-        // field for font color
+        // Group 2: Bingo images -> output path
+        String bingoImages = "Bingo Images:";
+        grid.add(new Label(bingoImages), 0, row);
+        grid.add(new TextField(), 1, row);
+        grid.add(new Button("Browse..."), 2, row);
+        row += 1;
+        String[] imageFields = {
+                "Bingo Header Image:", "Frame Image:",
+                "Free Space Image:", "Calling Cards Header:", "Token Image:"
+        };
+        for (String field : imageFields) {
+            grid.add(new Label(field), 0, row);
+            grid.add(new TextField(), 1, row);
+            grid.add(new Button("Browse..."), 2, row);
+            row += 1;
+        }
 
-        // fields for page margins
+        String outputPath = "Output Path:";
+        grid.add(new Label(outputPath), 0, row);
+        grid.add(new TextField(), 1, row);
+        grid.add(new Button("Browse..."), 2, row);
+        row += 1;
 
-        // field for instructions
-        // field of scissors
-        // field for font path
+        GridPane.setMargin(grid.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid.getChildren().get(grid.getChildren().size() - 2), new Insets(0,0,20,0));
+        GridPane.setMargin(grid.getChildren().get(grid.getChildren().size() - 3), new Insets(0,0,20,0));
+
+        // Group 3: Instructions, Font, Scissors
+        String[] lastFields = {"Instructions Path:", "Font Path:", "Scissors Image Path:"};
+        for (String field : lastFields) {
+            grid.add(new Label(field), 0, row);
+            grid.add(new TextField(), 1, row);
+            grid.add(new Button("Browse..."), 2, row);
+            row += 1;
+        }
+        generalTab.setContent(grid);
         generalTab.setClosable(false);
 
         Tab bingoCards = new Tab("Bingo Cards");
+        GridPane grid2 = new GridPane();
+        grid2.setPadding(new Insets(15));
+        grid2.setHgap(10);
+        grid2.setVgap(10);
+
+        int row2 = 0;
+        Label onePerPageHeader = new Label("1 Per Page");
+        onePerPageHeader.setFont(Font.font("System", FontWeight.BOLD, 18));
+        grid2.add(onePerPageHeader, 0, row2);
+        row2 += 1;
+
+        String[] headerFields = {
+                "Header Spacing Top:", "Header Spacing Right:",
+                "Header Spacing Bottom:", "Header Spacing Left:"
+        };
+
+        for (String field : headerFields) {
+            grid2.add(new Label(field), 0, row2);
+            grid2.add(new TextField(), 1, row2);
+            row2 += 1;
+        }
+
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+        String[] gridFields = {
+                "Grid Line Thickness:",
+                "Grid Spacing Right:", "Grid Spacing Bottom:", "Grid Spacing Left:"
+        };
+
+        for (String field : gridFields) {
+            grid2.add(new Label(field), 0, row2);
+            grid2.add(new TextField(), 1, row2);
+            row2 += 1;
+        }
+
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+        String[] iconsAndLabelsFields = {
+            "Label Size:", "Cell Horizontal Spacing:", "Cell Vertical Spacing:", "Cell Gap:"
+        };
+
+        for (String field : iconsAndLabelsFields) {
+            grid2.add(new Label(field), 0, row2);
+            grid2.add(new TextField(), 1, row2);
+            row2 += 1;
+        }
+
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+        grid2.add(new Label("Number of copies:"), 0, row2);
+        grid2.add(new TextField(), 1, row2);
+        row2 += 1;
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+
+        grid2.add(new Button("Generate 1 Per Page"), 1, row2);
+
+        row2 = 0;
+        Label twoPerPageHeader = new Label("2 Per Page");
+        twoPerPageHeader.setFont(Font.font("System", FontWeight.BOLD, 18));
+        grid2.add(twoPerPageHeader, 4, row2);
+        row2 += 1;
+
+        String[] headerFieldsTwo = {
+                "Header Spacing Top:", "Header Spacing Right:",
+                "Header Spacing Bottom:", "Header Spacing Left:"
+        };
+
+        for (String field : headerFieldsTwo) {
+            grid2.add(new Label(field), 4, row2);
+            grid2.add(new TextField(), 5, row2);
+            row2 += 1;
+        }
+
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+        String[] gridFieldsTwo = {
+                "Grid Line Thickness:",
+                "Grid Spacing Right:", "Grid Spacing Bottom:", "Grid Spacing Left:"
+        };
+
+        for (String field : gridFieldsTwo) {
+            grid2.add(new Label(field), 4, row2);
+            grid2.add(new TextField(), 5, row2);
+            row2 += 1;
+        }
+
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+        String[] iconsAndLabelsFieldsTwo = {
+                "Label Size:", "Cell Horizontal Spacing:", "Cell Vertical Spacing:", "Cell Gap:"
+        };
+
+        for (String field : iconsAndLabelsFieldsTwo) {
+            grid2.add(new Label(field), 4, row2);
+            grid2.add(new TextField(), 5, row2);
+            row2 += 1;
+        }
+
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+        grid2.add(new Label("Number of copies:"), 4, row2);
+        grid2.add(new TextField(), 5, row2);
+        row2 += 1;
+        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
+        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
+
+
+        grid2.add(new Button("Generate 2 Per Page"), 5, row2);
+        bingoCards.setContent(grid2);
         bingoCards.setClosable(false);
 
         Tab ccTokensRules = new Tab("C.C. Tokens and Rules");
@@ -96,7 +217,7 @@ public class Main extends Application {
 
         root.setCenter(tabPane);
 
-        Scene scene = new Scene(root, 900, 600);
+        Scene scene = new Scene(root, 900, 700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
