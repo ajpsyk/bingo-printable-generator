@@ -3,6 +3,9 @@ package org.bingo.ui;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
@@ -18,6 +21,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.converter.NumberStringConverter;
 import org.bingo.config.AssetPaths;
 import org.bingo.config.DocumentConfig;
 import org.bingo.config.PageConfig;
@@ -36,7 +40,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            String THEME_NAME = "Baby Shower";
+            String THEME_NAME = "Halloween Baby Shower";
             Path output = Paths.get("output");
             Path resources = Paths.get("resources");
             Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_1PerPage.pdf");
@@ -60,7 +64,7 @@ public class Main extends Application {
             DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
                     .assets(onePerPageBingoPaths)
                     .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
-                    .fontColor(new DeviceRgb(68, 68, 68))
+                    .fontColor(new DeviceRgb(65, 47, 38))
                     .marginTopInches(0.25f)
                     .marginBottomInches(0.25f)
                     .marginLeftInches(0.25f)
@@ -80,11 +84,11 @@ public class Main extends Application {
                     .build();
 
             PageConfig portraitBingo = PageConfig.builder()
-                    .headerSpacingTopInches(0.25f)
-                    .headerSpacingRightInches(0.35f)
+                    .headerSpacingTopInches(0.35f)
+                    .headerSpacingRightInches(0.45f)
                     .headerSpacingBottomInches(0.05f)
-                    .headerSpacingLeftInches(0.35f)
-                    .gridLineColor(new DeviceRgb(71, 69, 67))
+                    .headerSpacingLeftInches(0.45f)
+                    .gridLineColor(new DeviceRgb(61, 47, 40))
                     .gridRowAmount(5)
                     .gridColumnAmount(5)
                     .gridLineThicknessInches(0.014f)
@@ -166,7 +170,7 @@ public class Main extends Application {
         BorderPane root = new BorderPane();
         TabPane tabPane = new TabPane();
 
-        Tab assetsPathsTab = new Tab("Assets & Paths");
+        Tab assetsPaths = new Tab("Assets & Paths");
         AssetPathsTabData assetPathsTabData = new AssetPathsTabData();
         List<List<FieldSpec<?>>> assetsAndPathsTabGroups = List.of(
                 List.of(
@@ -191,38 +195,15 @@ public class Main extends Application {
                 )
         );
 
-        GridPane outerGrid = new GridPane();
-        outerGrid.setPadding(new Insets(15));
-
-        int outerRow = 0;
-
-        for (List<FieldSpec<?>> group : assetsAndPathsTabGroups)  {
-            GridPane innerGrid = new GridPane();
-            innerGrid.setPadding(new Insets(15));
-            innerGrid.setHgap(10);
-            innerGrid.setVgap(10);
-
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setMinWidth(100);
-            col1.setHgrow(Priority.NEVER);
-            ColumnConstraints col2 = new ColumnConstraints();
-            innerGrid.getColumnConstraints().addAll(col1, col2);
-
-            addGroupToTab(innerGrid, group);
-
-            outerGrid.add(innerGrid, 0, outerRow);
-            outerRow++;
-        }
-
-        assetsPathsTab.setContent(outerGrid);
-        assetsPathsTab.setClosable(false);
+        addContentToTab(assetsPaths, assetsAndPathsTabGroups);
+        assetsPaths.setClosable(false);
 
 
-        Tab bingoCardsTab = new Tab("Bingo Cards");
+        Tab bingoCards = new Tab("Bingo Cards");
         BingoCardsTabData bingoCardsTabData = new BingoCardsTabData();
         List<List<FieldSpec<?>>> bingoCardsTabGroups = List.of(
                 List.of(
-                        new FieldSpec<>("Theme Name:", assetPathsTabData.getTheme(), FieldType.TEXT)
+                        new FieldSpec<>("Header Spacing Top:", bingoCardsTabData.getHeaderSpacingTop(), FieldType.TEXT)
                 ),
                 List.of(
                         new FieldSpec<>("Grid Color:", assetPathsTabData.getGridColor(), FieldType.COLOR),
@@ -242,33 +223,7 @@ public class Main extends Application {
                         new FieldSpec<>("Scissors Icon Path:", assetPathsTabData.getScissors(), FieldType.FILE)
                 )
         );
-        /*
-        GridPane outerGrid = new GridPane();
-        outerGrid.setPadding(new Insets(15));
 
-        int outerRow = 0;
-
-        for (List<FieldSpec<?>> group : assetsAndPathsTabGroups)  {
-            GridPane innerGrid = new GridPane();
-            innerGrid.setPadding(new Insets(15));
-            innerGrid.setHgap(10);
-            innerGrid.setVgap(10);
-
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setMinWidth(100);
-            col1.setHgrow(Priority.NEVER);
-            ColumnConstraints col2 = new ColumnConstraints();
-            innerGrid.getColumnConstraints().addAll(col1, col2);
-
-            addGroupToTab(innerGrid, group);
-
-            outerGrid.add(innerGrid, 0, outerRow);
-            outerRow++;
-        }
-
-        assetsPathsTab.setContent(outerGrid);
-        assetsPathsTab.setClosable(false);
-        */
         // Tab 2
         Tab bingoCards = new Tab("Bingo Cards");
         GridPane grid2 = new GridPane();
@@ -425,6 +380,33 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    public static void addContentToTab(Tab tab, List<List<FieldSpec<?>>> content) {
+        GridPane outerGrid = new GridPane();
+        outerGrid.setPadding(new Insets(15));
+
+        int outerRow = 0;
+
+        for (List<FieldSpec<?>> group : content)  {
+            GridPane innerGrid = new GridPane();
+            innerGrid.setPadding(new Insets(15));
+            innerGrid.setHgap(10);
+            innerGrid.setVgap(10);
+
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setMinWidth(100);
+            col1.setHgrow(Priority.NEVER);
+            ColumnConstraints col2 = new ColumnConstraints();
+            innerGrid.getColumnConstraints().addAll(col1, col2);
+
+            addGroupToTab(innerGrid, group);
+
+            outerGrid.add(innerGrid, 0, outerRow);
+            outerRow++;
+        }
+
+        tab.setContent(outerGrid);
+    }
+
     public static void addGroupToTab(GridPane grid, List<FieldSpec<?>> group) {
         int row = grid.getRowCount();
         for  (FieldSpec<?> fieldSpec : group) {
@@ -466,6 +448,24 @@ public class Main extends Application {
                         if (selected != null) ((StringProperty) fieldSpec.getProperty()).set(selected.toString());
                     });
                     grid.add(browse, 2, row);
+                }
+                case DOUBLE -> {
+                    TextField textField = new TextField();
+                    Bindings.bindBidirectional(
+                            textField.textProperty(),
+                            (DoubleProperty) fieldSpec.getProperty(),
+                            new NumberStringConverter()
+                    );
+                    grid.add(textField, 1, row);
+                }
+                case INTEGER -> {
+                    TextField textField = new TextField();
+                    Bindings.bindBidirectional(
+                            textField.textProperty(),
+                            (IntegerProperty) fieldSpec.getProperty(),
+                            new NumberStringConverter()
+                    );
+                    grid.add(textField, 1, row);
                 }
             }
 
