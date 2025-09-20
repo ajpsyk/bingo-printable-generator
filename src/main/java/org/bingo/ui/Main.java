@@ -6,17 +6,16 @@ import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 import org.bingo.config.AssetPaths;
@@ -440,8 +439,57 @@ public class Main extends Application {
 
     public void handleButtonAction(String label) {
         if (assetPathsTabData.getTheme().getValue() == null || assetPathsTabData.getTheme().getValue().isBlank()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Theme Name is required.", ButtonType.OK);
-            alert.showAndWait();
+            showError("Theme Name is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getBingoIcons().getValue() == null || assetPathsTabData.getBingoIcons().getValue().isBlank()) {
+            showError("Image Directory is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getHeader().getValue() == null || assetPathsTabData.getHeader().getValue().isBlank()) {
+            showError("Header Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getFrame().getValue() == null || assetPathsTabData.getFrame().getValue().isBlank()) {
+            showError("Frame Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getFreeSpace().getValue() == null || assetPathsTabData.getFreeSpace().getValue().isBlank()) {
+            showError("Free Space Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getCcHeader().getValue() == null || assetPathsTabData.getCcHeader().getValue().isBlank()) {
+            showError("C.C. Header Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getToken().getValue() == null || assetPathsTabData.getToken().getValue().isBlank()) {
+            showError("Token Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getOutput().getValue() == null || assetPathsTabData.getOutput().getValue().isBlank()) {
+            showError("Output Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getInstructions().getValue() == null || assetPathsTabData.getInstructions().getValue().isBlank()) {
+            showError("Instructions Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getFont().getValue() == null || assetPathsTabData.getFont().getValue().isBlank()) {
+            showError("Font Path is required.");
+            return;
+        }
+
+        if (assetPathsTabData.getScissors().getValue() == null || assetPathsTabData.getScissors().getValue().isBlank()) {
+            showError("Scissors Path is required.");
             return;
         }
         String THEME_NAME = assetPathsTabData.getTheme().getValue();
@@ -592,6 +640,7 @@ public class Main extends Application {
                         .build();
 
                 PageConfig multiCallingCardsConfig = callingCardsSinglePage.toBuilder()
+                        .gridLineColor(new DeviceRgb(115, 115, 115))
                         .gridRowAmount(2)
                         .gridColumnAmount(2)
                         .headerSpacingBottomInches(0.2f)
@@ -614,6 +663,27 @@ public class Main extends Application {
             }
 
         }
+    }
+
+    private void showError(String message) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Error");
+
+        VBox box = new VBox(10);
+        box.setPrefSize(210, 150);
+        box.setPadding(new Insets(15));
+        Label label = new Label(message);
+        label.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
+        Button ok = new Button("OK");
+        ok.setOnAction(e -> dialog.close());
+
+        box.getChildren().addAll(label, ok);
+        box.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(box);
+        dialog.setScene(scene);
+        dialog.showAndWait();
     }
 
     public static void main(String[] args) {
