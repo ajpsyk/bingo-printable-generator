@@ -8,19 +8,19 @@ import lombok.Getter;
 
 @Getter
 public class BingoCardsTabData {
-    private final DoubleProperty headerSpacingTop =  new SimpleDoubleProperty();
-    private final DoubleProperty headerSpacingRight = new SimpleDoubleProperty();
-    private final DoubleProperty headerSpacingBottom = new SimpleDoubleProperty();
-    private final DoubleProperty headerSpacingLeft = new SimpleDoubleProperty();
-    private final DoubleProperty gridLineThickness = new SimpleDoubleProperty();
-    private final DoubleProperty gridSpacingRight= new SimpleDoubleProperty();
-    private final DoubleProperty gridSpacingBottom = new SimpleDoubleProperty();
-    private final DoubleProperty gridSpacingLeft= new SimpleDoubleProperty();
-    private final DoubleProperty labelSize = new SimpleDoubleProperty();
-    private final DoubleProperty cellHorizontalSpacing = new SimpleDoubleProperty();
-    private final DoubleProperty cellVerticalSpacing= new SimpleDoubleProperty();
-    private final DoubleProperty cellGap = new SimpleDoubleProperty();
-    private final IntegerProperty copies = new SimpleIntegerProperty();
+    private final DoubleProperty headerSpacingTop =  new SimpleDoubleProperty(0.3f);
+    private final DoubleProperty headerSpacingRight = new SimpleDoubleProperty(0.3f);
+    private final DoubleProperty headerSpacingBottom = new SimpleDoubleProperty(0.3f);
+    private final DoubleProperty headerSpacingLeft = new SimpleDoubleProperty(0.3f);
+    private final DoubleProperty gridLineThickness = new SimpleDoubleProperty(0.014f);
+    private final DoubleProperty gridSpacingRight= new SimpleDoubleProperty(0.3f);
+    private final DoubleProperty gridSpacingBottom = new SimpleDoubleProperty(0.3f);
+    private final DoubleProperty gridSpacingLeft= new SimpleDoubleProperty(0.3f);
+    private final DoubleProperty labelSize = new SimpleDoubleProperty(0.125f);
+    private final DoubleProperty cellHorizontalSpacing = new SimpleDoubleProperty(0.05f);
+    private final DoubleProperty cellVerticalSpacing= new SimpleDoubleProperty(0.05f);
+    private final DoubleProperty cellGap = new SimpleDoubleProperty(0.05f);
+    private final IntegerProperty copies = new SimpleIntegerProperty(100);
 
     public void reset() {
         headerSpacingTop.set(0.3f);

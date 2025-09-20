@@ -4,10 +4,7 @@ import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -36,354 +33,307 @@ import java.util.Random;
 
 
 public class Main extends Application {
+    private final AssetPathsTabData assetPathsTabData = new AssetPathsTabData();
+    private final BingoCardsTabData bingoCardsTabData = new BingoCardsTabData();
+    private final BingoCardsTabData landscapeBingoCardsTabData = new BingoCardsTabData();
 
     @Override
     public void start(Stage primaryStage) {
-        try {
-            String THEME_NAME = "Halloween Baby Shower";
-            Path output = Paths.get("output");
-            Path resources = Paths.get("resources");
-            Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_1PerPage.pdf");
-            Path TWO_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_2PerPage.pdf");
-            Path CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE = output.resolve(
-                    THEME_NAME + "_Calling Cards_Tokens_Rules.pdf"
-            );
+        List<List<FieldSpec<?>>> assetsAndPathsTabGroups = List.of(
+                List.of(
+                        new FieldSpec<>(
+                                "Theme Name:",
+                                assetPathsTabData.getTheme(),
+                                FieldType.TEXT
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Grid Color:",
+                                assetPathsTabData.getGridColor(),
+                                FieldType.COLOR
+                        ),
+                        new FieldSpec<>(
+                                "Label Color:",
+                                assetPathsTabData.getFontColor(),
+                                FieldType.COLOR
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Image Directory:",
+                                assetPathsTabData.getBingoIcons(),
+                                FieldType.DIRECTORY
+                        ),
+                        new FieldSpec<>(
+                                "Header Path:",
+                                assetPathsTabData.getHeader(),
+                                FieldType.FILE
+                        ),
+                        new FieldSpec<>(
+                                "Frame Path:",
+                                assetPathsTabData.getFrame(),
+                                FieldType.FILE),
+                        new FieldSpec<>(
+                                "Free Space Path:",
+                                assetPathsTabData.getFreeSpace(),
+                                FieldType.FILE
+                        ),
+                        new FieldSpec<>(
+                                "C.C. Header Path:",
+                                assetPathsTabData.getCcHeader(),
+                                FieldType.FILE
+                        ),
+                        new FieldSpec<>(
+                                "Token Path:",
+                                assetPathsTabData.getToken(),
+                                FieldType.FILE
+                        ),
+                        new FieldSpec<>(
+                                "Output Path:",
+                                assetPathsTabData.getOutput(),
+                                FieldType.DIRECTORY
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Instructions Path:",
+                                assetPathsTabData.getInstructions(),
+                                FieldType.FILE
+                        ),
+                        new FieldSpec<>(
+                                "Font Path:",
+                                assetPathsTabData.getFont(),
+                                FieldType.FILE
+                        ),
+                        new FieldSpec<>(
+                                "Scissors Icon Path:",
+                                assetPathsTabData.getScissors(),
+                                FieldType.FILE
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Generate C.C., Tokens, and Instructions",
+                                null,
+                                FieldType.BUTTON
+                        )
+                )
+        );
 
-            AssetPaths onePerPageBingoPaths = AssetPaths.builder()
-                    .framePath(resources.resolve("frame.png"))
-                    .headerPath(resources.resolve("header.png"))
-                    .iconsPath(resources.resolve("icons"))
-                    .fontPath(resources.resolve("Dekko-Regular.ttf"))
-                    .freeSpacePath(resources.resolve("Free Space.png"))
-                    .instructionsPath(resources.resolve("How To Play.pdf"))
-                    .scissorsIconPath(resources.resolve("Scissors.png"))
-                    .tokenPath(resources.resolve("Token.png"))
-                    .callingCardsHeaderPath(resources.resolve("calling_card_header.png"))
-                    .build();
 
-            DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
-                    .assets(onePerPageBingoPaths)
-                    .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
-                    .fontColor(new DeviceRgb(65, 47, 38))
-                    .marginTopInches(0.25f)
-                    .marginBottomInches(0.25f)
-                    .marginLeftInches(0.25f)
-                    .marginRightInches(0.25f)
-                    .build();
+        List<List<FieldSpec<?>>> bingoCardsTabGroups = List.of(
+                List.of(
+                        new FieldSpec<>(
+                                "1 Per Page",
+                                null,
+                                FieldType.HEADER
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Header Spacing Top:",
+                                bingoCardsTabData.getHeaderSpacingTop(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Header Spacing Right:",
+                                bingoCardsTabData.getHeaderSpacingRight(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Header Spacing Bottom:",
+                                bingoCardsTabData.getHeaderSpacingBottom(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Header Spacing Left:",
+                                bingoCardsTabData.getHeaderSpacingLeft(),
+                                FieldType.DOUBLE
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Grid Line Thickness:",
+                                bingoCardsTabData.getGridLineThickness(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Grid Spacing Right:",
+                                bingoCardsTabData.getGridSpacingRight(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Grid Spacing Bottom:",
+                                bingoCardsTabData.getGridSpacingBottom(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Grid Spacing Left:",
+                                bingoCardsTabData.getGridSpacingLeft(),
+                                FieldType.DOUBLE
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Label Size:",
+                                bingoCardsTabData.getLabelSize(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Cell Padding:",
+                                bingoCardsTabData.getCellHorizontalSpacing(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Label Spacing Bottom:",
+                                bingoCardsTabData.getCellVerticalSpacing(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Cell Gap:",
+                                bingoCardsTabData.getCellGap(),
+                                FieldType.DOUBLE
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Number of copies:",
+                                bingoCardsTabData.getCopies(),
+                                FieldType.INTEGER
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Generate 1 Per Page",
+                                null,
+                                FieldType.BUTTON
+                        )
+                )
+        );
 
-            DocumentConfig twoPerPageBingoCards = onePerPageBingoCards.toBuilder()
-                    .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
-                    .pageSize(PageSize.LETTER.rotate())
-                    .marginTopInches(0.625f)
-                    .marginBottomInches(0.625f)
-                    .seed(new Random(1))
-                    .build();
-
-            DocumentConfig instructionsTokensCallingCards = onePerPageBingoCards.toBuilder()
-                    .outputPath(CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE)
-                    .build();
-
-            PageConfig portraitBingo = PageConfig.builder()
-                    .headerSpacingTopInches(0.35f)
-                    .headerSpacingRightInches(0.45f)
-                    .headerSpacingBottomInches(0.05f)
-                    .headerSpacingLeftInches(0.45f)
-                    .gridLineColor(new DeviceRgb(61, 47, 40))
-                    .gridRowAmount(5)
-                    .gridColumnAmount(5)
-                    .gridLineThicknessInches(0.014f)
-                    .gridSpacingRightInches(0.35f)
-                    .gridSpacingLeftInches(0.35f)
-                    .gridSpacingBottomInches(0.375f)
-                    .labelHeightRatio(0.125f)
-                    .cellSpacingXRatio(0.05f)
-                    .cellSpacingYRatio(0.05f)
-                    .cellGapRatio(0.05f)
-                    .copies(100)
-                    .build();
-
-            PageConfig landscapeBingo = portraitBingo.toBuilder()
-                    .labelHeightRatio(0.11f)
-                    .headerSpacingTopInches(0.2f)
-                    .headerSpacingLeftInches(0.3f)
-                    .headerSpacingRightInches(0.3f)
-                    .headerSpacingBottomInches(0.025f)
-                    .gridSpacingRightInches(0.225f)
-                    .gridSpacingLeftInches(0.225f)
-                    .gridSpacingBottomInches(0.27f)
-                    .gridLineThicknessInches(0.007f)
-                    .cellSpacingXRatio(0.10f)
-                    .build();
-
-            PageConfig tokens = portraitBingo.toBuilder()
-                    .gridLineColor(new DeviceRgb(115, 115, 115))
-                    .gridRowAmount(9)
-                    .gridColumnAmount(9)
-                    .copies(1)
-                    .headerSpacingTopInches(0f)
-                    .headerSpacingLeftInches(0f)
-                    .headerSpacingBottomInches(0.2f)
-                    .gridSpacingBottomInches(0f)
-                    .gridSpacingRightInches(0f)
-                    .gridSpacingLeftInches(0f)
-                    .headerSpacingRightInches(6.8f)
-                    .labelHeightRatio(0)
-                    .cellSpacingXRatio(0.15f)
-                    .build();
-
-            PageConfig callingCardsSinglePage = portraitBingo.toBuilder()
-                    .gridRowAmount(6)
-                    .gridColumnAmount(5)
-                    .copies(1)
-                    .gridLineThicknessInches(0.014f)
-                    .headerSpacingTopInches(0f)
-                    .headerSpacingBottomInches(0.1f)
-                    .gridSpacingRightInches(0f)
-                    .gridSpacingLeftInches(0f)
-                    .gridSpacingBottomInches(0f)
-                    .build();
-
-            PageConfig multiCallingCardsConfig = callingCardsSinglePage.toBuilder()
-                    .gridRowAmount(2)
-                    .gridColumnAmount(2)
-                    .headerSpacingBottomInches(0.2f)
-                    .labelHeightRatio(0.11f)
-                    .gridLineThicknessInches(0.01f)
-                    .build();
-
-            PageConfig multiCallingLastCardsConfig = multiCallingCardsConfig.toBuilder()
-                    .gridRowAmount(1)
-                    .gridSpacingBottomInches(4.7f)
-                    .build();
-
-            DocumentBuilder.buildOnePerPageBingoCards(onePerPageBingoCards, portraitBingo);
-            DocumentBuilder.buildTwoPerPageBingoCards(twoPerPageBingoCards, landscapeBingo);
-            DocumentBuilder.buildInstructionsTokensCallingCards(instructionsTokensCallingCards,
-                    tokens, callingCardsSinglePage,
-                    multiCallingCardsConfig, multiCallingLastCardsConfig
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<List<FieldSpec<?>>> landscapeBingoCardsTabGroups = List.of(
+                List.of(
+                        new FieldSpec<>(
+                                "2 Per Page",
+                                null,
+                                FieldType.HEADER
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Header Spacing Top:",
+                                landscapeBingoCardsTabData.getHeaderSpacingTop(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Header Spacing Right:",
+                                landscapeBingoCardsTabData.getHeaderSpacingRight(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Header Spacing Bottom:",
+                                landscapeBingoCardsTabData.getHeaderSpacingBottom(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Header Spacing Left:",
+                                landscapeBingoCardsTabData.getHeaderSpacingLeft(),
+                                FieldType.DOUBLE
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Grid Line Thickness:",
+                                landscapeBingoCardsTabData.getGridLineThickness(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Grid Spacing Right:",
+                                landscapeBingoCardsTabData.getGridSpacingRight(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Grid Spacing Bottom:",
+                                landscapeBingoCardsTabData.getGridSpacingBottom(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Grid Spacing Left:",
+                                landscapeBingoCardsTabData.getGridSpacingLeft(),
+                                FieldType.DOUBLE
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Label Size:",
+                                landscapeBingoCardsTabData.getLabelSize(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Cell Padding:",
+                                landscapeBingoCardsTabData.getCellHorizontalSpacing(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Label Spacing Bottom:",
+                                landscapeBingoCardsTabData.getCellVerticalSpacing(),
+                                FieldType.DOUBLE
+                        ),
+                        new FieldSpec<>(
+                                "Cell Gap:",
+                                landscapeBingoCardsTabData.getCellGap(),
+                                FieldType.DOUBLE
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Number of copies:",
+                                landscapeBingoCardsTabData.getCopies(),
+                                FieldType.INTEGER
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Generate 2 Per Page",
+                                null,
+                                FieldType.BUTTON
+                        )
+                )
+        );
 
         primaryStage.setTitle("Bingo PDF Builder");
         BorderPane root = new BorderPane();
         TabPane tabPane = new TabPane();
 
         Tab assetsPaths = new Tab("Assets & Paths");
-        AssetPathsTabData assetPathsTabData = new AssetPathsTabData();
-        List<List<FieldSpec<?>>> assetsAndPathsTabGroups = List.of(
-                List.of(
-                        new FieldSpec<>("Theme Name:", assetPathsTabData.getTheme(), FieldType.TEXT)
-                ),
-                List.of(
-                        new FieldSpec<>("Grid Color:", assetPathsTabData.getGridColor(), FieldType.COLOR),
-                        new FieldSpec<>("Label Color:", assetPathsTabData.getFontColor(), FieldType.COLOR)
-                ),
-                List.of(
-                        new FieldSpec<>("Image Directory:", assetPathsTabData.getBingoIcons(), FieldType.DIRECTORY),
-                        new FieldSpec<>("Header Path:", assetPathsTabData.getHeader(), FieldType.FILE),
-                        new FieldSpec<>("Frame Path:", assetPathsTabData.getFrame(), FieldType.FILE),
-                        new FieldSpec<>("Free Space Path:", assetPathsTabData.getFreeSpace(), FieldType.FILE),
-                        new FieldSpec<>("C.C. Header Path:", assetPathsTabData.getCcHeader(), FieldType.FILE),
-                        new FieldSpec<>("Token Path:", assetPathsTabData.getToken(), FieldType.FILE)
-                ),
-                List.of(
-                        new FieldSpec<>("Instructions Path:", assetPathsTabData.getInstructions(), FieldType.FILE),
-                        new FieldSpec<>("Font Path:", assetPathsTabData.getFont(), FieldType.FILE),
-                        new FieldSpec<>("Scissors Icon Path:", assetPathsTabData.getScissors(), FieldType.FILE)
-                )
-        );
-
-        addContentToTab(assetsPaths, assetsAndPathsTabGroups);
         assetsPaths.setClosable(false);
-
-
         Tab bingoCards = new Tab("Bingo Cards");
-        BingoCardsTabData bingoCardsTabData = new BingoCardsTabData();
-        List<List<FieldSpec<?>>> bingoCardsTabGroups = List.of(
-                List.of(
-                        new FieldSpec<>("Header Spacing Top:", bingoCardsTabData.getHeaderSpacingTop(), FieldType.TEXT)
-                ),
-                List.of(
-                        new FieldSpec<>("Grid Color:", assetPathsTabData.getGridColor(), FieldType.COLOR),
-                        new FieldSpec<>("Label Color:", assetPathsTabData.getFontColor(), FieldType.COLOR)
-                ),
-                List.of(
-                        new FieldSpec<>("Image Directory:", assetPathsTabData.getBingoIcons(), FieldType.DIRECTORY),
-                        new FieldSpec<>("Header Path:", assetPathsTabData.getHeader(), FieldType.FILE),
-                        new FieldSpec<>("Frame Path:", assetPathsTabData.getFrame(), FieldType.FILE),
-                        new FieldSpec<>("Free Space Path:", assetPathsTabData.getFreeSpace(), FieldType.FILE),
-                        new FieldSpec<>("C.C. Header Path:", assetPathsTabData.getCcHeader(), FieldType.FILE),
-                        new FieldSpec<>("Token Path:", assetPathsTabData.getToken(), FieldType.FILE)
-                ),
-                List.of(
-                        new FieldSpec<>("Instructions Path:", assetPathsTabData.getInstructions(), FieldType.FILE),
-                        new FieldSpec<>("Font Path:", assetPathsTabData.getFont(), FieldType.FILE),
-                        new FieldSpec<>("Scissors Icon Path:", assetPathsTabData.getScissors(), FieldType.FILE)
-                )
-        );
-
-        // Tab 2
-        Tab bingoCards = new Tab("Bingo Cards");
-        GridPane grid2 = new GridPane();
-        grid2.setPadding(new Insets(15));
-        grid2.setHgap(10);
-        grid2.setVgap(10);
-
-        int row2 = 0;
-        Label onePerPageHeader = new Label("1 Per Page");
-        onePerPageHeader.setFont(Font.font("System", FontWeight.BOLD, 18));
-        grid2.add(onePerPageHeader, 0, row2);
-        row2 += 1;
-
-        String[] headerFields = {
-                "Header Spacing Top:", "Header Spacing Right:",
-                "Header Spacing Bottom:", "Header Spacing Left:"
-        };
-
-        for (String field : headerFields) {
-            grid2.add(new Label(field), 0, row2);
-            grid2.add(new TextField(), 1, row2);
-            row2 += 1;
-        }
-
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-        String[] gridFields = {
-                "Grid Line Thickness:",
-                "Grid Spacing Right:", "Grid Spacing Bottom:", "Grid Spacing Left:"
-        };
-
-        for (String field : gridFields) {
-            grid2.add(new Label(field), 0, row2);
-            grid2.add(new TextField(), 1, row2);
-            row2 += 1;
-        }
-
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-        String[] iconsAndLabelsFields = {
-            "Label Size:", "Cell Horizontal Spacing:", "Cell Vertical Spacing:", "Cell Gap:"
-        };
-
-        for (String field : iconsAndLabelsFields) {
-            grid2.add(new Label(field), 0, row2);
-            grid2.add(new TextField(), 1, row2);
-            row2 += 1;
-        }
-
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-        grid2.add(new Label("Number of copies:"), 0, row2);
-        grid2.add(new TextField(), 1, row2);
-        row2 += 1;
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-
-        grid2.add(new Button("Generate 1 Per Page"), 1, row2);
-
-        row2 = 0;
-        Label twoPerPageHeader = new Label("2 Per Page");
-        twoPerPageHeader.setFont(Font.font("System", FontWeight.BOLD, 18));
-        grid2.add(twoPerPageHeader, 4, row2);
-        row2 += 1;
-
-        String[] headerFieldsTwo = {
-                "Header Spacing Top:", "Header Spacing Right:",
-                "Header Spacing Bottom:", "Header Spacing Left:"
-        };
-
-        for (String field : headerFieldsTwo) {
-            grid2.add(new Label(field), 4, row2);
-            grid2.add(new TextField(), 5, row2);
-            row2 += 1;
-        }
-
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-        String[] gridFieldsTwo = {
-                "Grid Line Thickness:",
-                "Grid Spacing Right:", "Grid Spacing Bottom:", "Grid Spacing Left:"
-        };
-
-        for (String field : gridFieldsTwo) {
-            grid2.add(new Label(field), 4, row2);
-            grid2.add(new TextField(), 5, row2);
-            row2 += 1;
-        }
-
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-        String[] iconsAndLabelsFieldsTwo = {
-                "Label Size:", "Cell Horizontal Spacing:", "Cell Vertical Spacing:", "Cell Gap:"
-        };
-
-        for (String field : iconsAndLabelsFieldsTwo) {
-            grid2.add(new Label(field), 4, row2);
-            grid2.add(new TextField(), 5, row2);
-            row2 += 1;
-        }
-
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-        grid2.add(new Label("Number of copies:"), 4, row2);
-        grid2.add(new TextField(), 5, row2);
-        row2 += 1;
-        GridPane.setMargin(grid2.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid2.getChildren().get(grid2.getChildren().size() - 2), new Insets(0,0,20,0));
-
-
-        grid2.add(new Button("Generate 2 Per Page"), 5, row2);
-        bingoCards.setContent(grid2);
         bingoCards.setClosable(false);
 
-        Tab ccTokensInstructions = new Tab("C.C, Tokens, Instructions");
-        GridPane grid3 = new GridPane();
-        grid3.setPadding(new Insets(15));
-        grid3.setHgap(10);
-        grid3.setVgap(10);
+        GridPane assetsGrid = new GridPane();
+        GridPane bingoCardsGrid = new GridPane();
 
-        int row3 = 0;
+        ColumnConstraints outerConstraint = new ColumnConstraints();
+        outerConstraint.setMinWidth(200);
+        outerConstraint.setHgrow(Priority.NEVER);
+        bingoCardsGrid.getColumnConstraints().addAll(outerConstraint);
 
-        String[] ccGridFields = {
-                "Grid Line Thickness:"
-        };
-
-        for (String field : ccGridFields) {
-            grid3.add(new Label(field), 0, row3);
-            grid3.add(new TextField(), 1, row3);
-            row3 += 1;
-        }
-
-        GridPane.setMargin(grid3.getChildren().getLast(), new Insets(0,0,20,0));
-        GridPane.setMargin(grid3.getChildren().get(grid3.getChildren().size() - 2), new Insets(0,0,20,0));
+        addContentToTab(assetsGrid, assetsPaths, assetsAndPathsTabGroups, 100, 0);
+        addContentToTab(bingoCardsGrid, bingoCards, bingoCardsTabGroups, 140, 0);
+        addContentToTab(bingoCardsGrid, bingoCards, landscapeBingoCardsTabGroups, 140, 1);
 
 
-        grid3.add(new Button("Generate C.C., Tokens, and Instructions"), 1, row3);
-        ccTokensInstructions.setContent(grid3);
-        ccTokensInstructions.setClosable(false);
-
-        tabPane.getTabs().addAll(assetsPathsTab, bingoCards, ccTokensInstructions);
+        tabPane.getTabs().addAll(assetsPaths, bingoCards);
 
         root.setCenter(tabPane);
 
-        Scene scene = new Scene(root, 900, 700);
+        Scene scene = new Scene(root, 1000, 750);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    public static void addContentToTab(Tab tab, List<List<FieldSpec<?>>> content) {
-        GridPane outerGrid = new GridPane();
-        outerGrid.setPadding(new Insets(15));
-
+    public void addContentToTab(GridPane outerGrid, Tab tab, List<List<FieldSpec<?>>> content, int colWidth, int startColumn) {
         int outerRow = 0;
 
         for (List<FieldSpec<?>> group : content)  {
@@ -392,38 +342,40 @@ public class Main extends Application {
             innerGrid.setHgap(10);
             innerGrid.setVgap(10);
 
-            ColumnConstraints col1 = new ColumnConstraints();
-            col1.setMinWidth(100);
-            col1.setHgrow(Priority.NEVER);
-            ColumnConstraints col2 = new ColumnConstraints();
-            innerGrid.getColumnConstraints().addAll(col1, col2);
+            ColumnConstraints innerConstraint = new ColumnConstraints();
+            innerConstraint.setMinWidth(colWidth);
+            innerConstraint.setHgrow(Priority.NEVER);
+            innerGrid.getColumnConstraints().addAll(innerConstraint);
 
             addGroupToTab(innerGrid, group);
 
-            outerGrid.add(innerGrid, 0, outerRow);
+            outerGrid.add(innerGrid, startColumn, outerRow);
             outerRow++;
         }
 
         tab.setContent(outerGrid);
     }
 
-    public static void addGroupToTab(GridPane grid, List<FieldSpec<?>> group) {
+    public void addGroupToTab(GridPane grid, List<FieldSpec<?>> group) {
         int row = grid.getRowCount();
         for  (FieldSpec<?> fieldSpec : group) {
-            grid.add(new Label(fieldSpec.getLabel()), 0, row);
+            Label label = new Label(fieldSpec.getLabel());
 
             switch (fieldSpec.type) {
                 case TEXT -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
                     TextField textField = new TextField();
                     textField.textProperty().bindBidirectional((StringProperty) fieldSpec.getProperty());
                     grid.add(textField, 1, row);
                 }
                 case COLOR -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
                     ColorPicker colorPicker = new ColorPicker();
-                    colorPicker.valueProperty().bindBidirectional((ObjectProperty<Color>) fieldSpec.getProperty());
+                    colorPicker.valueProperty().bindBidirectional((Property<Color>) fieldSpec.getProperty());
                     grid.add(colorPicker, 1, row);
                 }
                 case FILE -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
                     TextField pathField = new TextField();
                     pathField.textProperty().bindBidirectional((StringProperty) fieldSpec.getProperty());
                     grid.add(pathField, 1, row);
@@ -437,6 +389,7 @@ public class Main extends Application {
                     grid.add(browse, 2, row);
                 }
                 case DIRECTORY -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
                     TextField dirField = new TextField();
                     dirField.textProperty().bindBidirectional((StringProperty) fieldSpec.getProperty());
                     grid.add(dirField, 1, row);
@@ -450,6 +403,7 @@ public class Main extends Application {
                     grid.add(browse, 2, row);
                 }
                 case DOUBLE -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
                     TextField textField = new TextField();
                     Bindings.bindBidirectional(
                             textField.textProperty(),
@@ -459,6 +413,7 @@ public class Main extends Application {
                     grid.add(textField, 1, row);
                 }
                 case INTEGER -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
                     TextField textField = new TextField();
                     Bindings.bindBidirectional(
                             textField.textProperty(),
@@ -467,9 +422,197 @@ public class Main extends Application {
                     );
                     grid.add(textField, 1, row);
                 }
+                case HEADER -> {
+                    label.setFont(Font.font("System", FontWeight.BOLD, 18));
+                    grid.add(label, 0, row);
+                }
+                case BUTTON -> {
+                    Button btn = new Button(label.getText());
+                    btn.setOnAction(e -> handleButtonAction(fieldSpec.getLabel()));
+                    grid.add(btn, 1, row);
+                }
+                default -> {}
             }
 
             row++;
+        }
+    }
+
+    public void handleButtonAction(String label) {
+        if (assetPathsTabData.getTheme().getValue() == null || assetPathsTabData.getTheme().getValue().isBlank()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Theme Name is required.", ButtonType.OK);
+            alert.showAndWait();
+            return;
+        }
+        String THEME_NAME = assetPathsTabData.getTheme().getValue();
+        Path output = Paths.get(assetPathsTabData.getOutput().getValue());
+        Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_1PerPage.pdf");
+        Path TWO_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_2PerPage.pdf");
+        Path CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE = output.resolve(
+                THEME_NAME + "_Calling Cards_Tokens_Rules.pdf"
+        );
+
+
+        AssetPaths paths = AssetPaths.builder()
+                .framePath(Paths.get(assetPathsTabData.getFrame().getValue()))
+                .headerPath(Paths.get(assetPathsTabData.getHeader().getValue()))
+                .iconsPath(Paths.get(assetPathsTabData.getBingoIcons().getValue()))
+                .fontPath(Paths.get(assetPathsTabData.getFont().getValue()))
+                .freeSpacePath(Paths.get(assetPathsTabData.getFreeSpace().getValue()))
+                .instructionsPath(Paths.get(assetPathsTabData.getInstructions().getValue()))
+                .scissorsIconPath(Paths.get(assetPathsTabData.getScissors().getValue()))
+                .tokenPath(Paths.get(assetPathsTabData.getToken().getValue()))
+                .callingCardsHeaderPath(Paths.get(assetPathsTabData.getCcHeader().getValue()))
+                .build();
+
+        Color fontColor = assetPathsTabData.getFontColor().getValue();
+        Color gridColor = assetPathsTabData.getGridColor().getValue();
+        DeviceRgb pdfFontColor = new DeviceRgb(
+                (int) (fontColor.getRed() * 255),
+                (int) (fontColor.getGreen() * 255),
+                (int) (fontColor.getBlue() * 255)
+        );
+        DeviceRgb pdfGridColor = new DeviceRgb(
+                (int) (gridColor.getRed() * 255),
+                (int) (gridColor.getGreen() * 255),
+                (int) (gridColor.getBlue() * 255)
+        );
+
+        switch (label) {
+            case "Generate 1 Per Page" -> {
+                DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
+                        .assets(paths)
+                        .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
+                        .fontColor(pdfFontColor)
+                        .marginTopInches(0.25f)
+                        .marginBottomInches(0.25f)
+                        .marginLeftInches(0.25f)
+                        .marginRightInches(0.25f)
+                        .build();
+
+                PageConfig portraitBingo = PageConfig.builder()
+                        .headerSpacingTopInches(bingoCardsTabData.getHeaderSpacingTop().getValue().floatValue())
+                        .headerSpacingRightInches(bingoCardsTabData.getHeaderSpacingRight().getValue().floatValue())
+                        .headerSpacingBottomInches(bingoCardsTabData.getHeaderSpacingBottom().getValue().floatValue())
+                        .headerSpacingLeftInches(bingoCardsTabData.getHeaderSpacingLeft().getValue().floatValue())
+                        .gridLineColor(pdfGridColor)
+                        .gridRowAmount(5)
+                        .gridColumnAmount(5)
+                        .gridLineThicknessInches(bingoCardsTabData.getGridLineThickness().getValue().floatValue())
+                        .gridSpacingRightInches(bingoCardsTabData.getGridSpacingRight().getValue().floatValue())
+                        .gridSpacingLeftInches(bingoCardsTabData.getGridSpacingLeft().getValue().floatValue())
+                        .gridSpacingBottomInches(bingoCardsTabData.getGridSpacingBottom().getValue().floatValue())
+                        .labelHeightRatio(bingoCardsTabData.getLabelSize().getValue().floatValue())
+                        .cellSpacingXRatio(bingoCardsTabData.getCellHorizontalSpacing().getValue().floatValue())
+                        .cellSpacingYRatio(bingoCardsTabData.getCellVerticalSpacing().getValue().floatValue())
+                        .cellGapRatio(bingoCardsTabData.getCellGap().getValue().floatValue())
+                        .copies(bingoCardsTabData.getCopies().getValue())
+                        .build();
+                try {
+                    DocumentBuilder.buildOnePerPageBingoCards(onePerPageBingoCards, portraitBingo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+            case "Generate 2 Per Page" -> {
+                DocumentConfig twoPerPageBingoCards = DocumentConfig.builder()
+                        .assets(paths)
+                        .fontColor(pdfFontColor)
+                        .marginLeftInches(0.25f)
+                        .marginRightInches(0.25f)
+                        .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
+                        .pageSize(PageSize.LETTER.rotate())
+                        .marginTopInches(0.625f)
+                        .marginBottomInches(0.625f)
+                        .seed(new Random(1))
+                        .build();
+
+                PageConfig landscapeBingo = PageConfig.builder()
+                        .headerSpacingTopInches(landscapeBingoCardsTabData.getHeaderSpacingTop().getValue().floatValue())
+                        .headerSpacingRightInches(landscapeBingoCardsTabData.getHeaderSpacingRight().getValue().floatValue())
+                        .headerSpacingBottomInches(landscapeBingoCardsTabData.getHeaderSpacingBottom().getValue().floatValue())
+                        .headerSpacingLeftInches(landscapeBingoCardsTabData.getHeaderSpacingLeft().getValue().floatValue())
+                        .gridLineColor(pdfGridColor)
+                        .gridRowAmount(5)
+                        .gridColumnAmount(5)
+                        .gridLineThicknessInches(landscapeBingoCardsTabData.getGridLineThickness().getValue().floatValue())
+                        .gridSpacingRightInches(landscapeBingoCardsTabData.getGridSpacingRight().getValue().floatValue())
+                        .gridSpacingLeftInches(landscapeBingoCardsTabData.getGridSpacingLeft().getValue().floatValue())
+                        .gridSpacingBottomInches(landscapeBingoCardsTabData.getGridSpacingBottom().getValue().floatValue())
+                        .labelHeightRatio(landscapeBingoCardsTabData.getLabelSize().getValue().floatValue())
+                        .cellSpacingXRatio(landscapeBingoCardsTabData.getCellHorizontalSpacing().getValue().floatValue())
+                        .cellSpacingYRatio(landscapeBingoCardsTabData.getCellVerticalSpacing().getValue().floatValue())
+                        .cellGapRatio(landscapeBingoCardsTabData.getCellGap().getValue().floatValue())
+                        .copies(landscapeBingoCardsTabData.getCopies().getValue())
+                        .build();
+                try {
+                    DocumentBuilder.buildTwoPerPageBingoCards(twoPerPageBingoCards, landscapeBingo);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            case "Generate C.C., Tokens, and Instructions" -> {
+
+                DocumentConfig instructionsTokensCallingCards = DocumentConfig.builder()
+                        .assets(paths)
+                        .fontColor(pdfFontColor)
+                        .marginTopInches(0.25f)
+                        .marginBottomInches(0.25f)
+                        .marginLeftInches(0.25f)
+                        .marginRightInches(0.25f)
+                        .outputPath(CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE)
+                        .build();
+
+                PageConfig tokens = PageConfig.builder()
+                        .gridLineThicknessInches(bingoCardsTabData.getGridLineThickness().getValue().floatValue())
+                        .cellSpacingYRatio(bingoCardsTabData.getCellVerticalSpacing().getValue().floatValue())
+                        .gridLineColor(new DeviceRgb(115, 115, 115))
+                        .gridRowAmount(9)
+                        .gridColumnAmount(9)
+                        .copies(1)
+                        .headerSpacingBottomInches(0.2f)
+                        .headerSpacingRightInches(6.8f)
+                        .cellSpacingXRatio(0.15f)
+                        .build();
+
+                PageConfig callingCardsSinglePage = PageConfig.builder()
+                        .gridLineColor(pdfGridColor)
+                        .gridSpacingRightInches(bingoCardsTabData.getGridSpacingRight().getValue().floatValue())
+                        .gridSpacingLeftInches(bingoCardsTabData.getGridSpacingLeft().getValue().floatValue())
+                        .labelHeightRatio(bingoCardsTabData.getLabelSize().getValue().floatValue())
+                        .cellSpacingXRatio(bingoCardsTabData.getCellHorizontalSpacing().getValue().floatValue())
+                        .cellSpacingYRatio(bingoCardsTabData.getCellVerticalSpacing().getValue().floatValue())
+                        .cellGapRatio(bingoCardsTabData.getCellGap().getValue().floatValue())
+                        .gridRowAmount(6)
+                        .gridColumnAmount(5)
+                        .copies(1)
+                        .gridLineThicknessInches(0.014f)
+                        .headerSpacingBottomInches(0.1f)
+                        .build();
+
+                PageConfig multiCallingCardsConfig = callingCardsSinglePage.toBuilder()
+                        .gridRowAmount(2)
+                        .gridColumnAmount(2)
+                        .headerSpacingBottomInches(0.2f)
+                        .labelHeightRatio(0.11f)
+                        .gridLineThicknessInches(0.01f)
+                        .build();
+
+                PageConfig multiCallingLastCardsConfig = multiCallingCardsConfig.toBuilder()
+                        .gridRowAmount(1)
+                        .gridSpacingBottomInches(4.7f)
+                        .build();
+                try {
+                    DocumentBuilder.buildInstructionsTokensCallingCards(instructionsTokensCallingCards,
+                            tokens, callingCardsSinglePage,
+                            multiCallingCardsConfig, multiCallingLastCardsConfig
+                    );
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
 
