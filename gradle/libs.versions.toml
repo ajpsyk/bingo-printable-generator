@@ -4,6 +4,7 @@
 [versions]
 itext = "9.2.0"
 lombok = "1.18.38"
+jackson = "2.20.0"
 
 [libraries]
 itextKernel = {module = "com.itextpdf:kernel", version.ref = "itext"}
@@ -11,3 +12,6 @@ itextIO = {module = "com.itextpdf:io", version.ref = "itext"}
 itextSVG = {module = "com.itextpdf:svg", version.ref = "itext"}
 
 lombok = {module = "org.projectlombok:lombok", version.ref = "lombok"}
+
+jackson = {module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson"}
+jacksonDatabind = {module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson"}

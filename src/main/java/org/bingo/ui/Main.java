@@ -22,12 +22,12 @@ import org.bingo.config.AssetPaths;
 import org.bingo.config.DocumentConfig;
 import org.bingo.config.PageConfig;
 import org.bingo.services.DocumentBuilder;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -38,6 +38,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        loadData();
+        
         List<List<FieldSpec<?>>> assetsAndPathsTabGroups = List.of(
                 List.of(
                         new FieldSpec<>(
@@ -116,6 +118,13 @@ public class Main extends Application {
                                 "Generate C.C., Tokens, and Instructions",
                                 null,
                                 FieldType.BUTTON
+                        )
+                ),
+                List.of(
+                        new FieldSpec<>(
+                                "Restore Defaults",
+                                null,
+                                FieldType.RESET
                         )
                 )
         );
@@ -328,6 +337,8 @@ public class Main extends Application {
         root.setCenter(tabPane);
 
         Scene scene = new Scene(root, 1000, 750);
+
+        primaryStage.setOnCloseRequest(event -> saveData());
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -382,6 +393,11 @@ public class Main extends Application {
                     Button browse = new Button("Browse...");
                     browse.setOnAction(e -> {
                         FileChooser chooser = new FileChooser();
+                        chooser.setTitle("Select " + fieldSpec.getLabel());
+                        File initialFile = new File(((StringProperty) fieldSpec.getProperty()).get());
+                        if (initialFile.exists()) {
+                            chooser.setInitialDirectory(initialFile.getParentFile());
+                        }
                         File selected = chooser.showOpenDialog(grid.getScene().getWindow());
                         if (selected != null) ((StringProperty) fieldSpec.getProperty()).set(selected.toString());
                     });
@@ -396,6 +412,11 @@ public class Main extends Application {
                     Button browse = new Button("Browse...");
                     browse.setOnAction(e -> {
                         DirectoryChooser chooser = new DirectoryChooser();
+                        chooser.setTitle("Select " + fieldSpec.getLabel());
+                        File initialDir = new File(((StringProperty) fieldSpec.getProperty()).get());
+                        if (initialDir.exists() && initialDir.isDirectory()) {
+                            chooser.setInitialDirectory(initialDir);
+                        }
                         File selected = chooser.showDialog(grid.getScene().getWindow());
                         if (selected != null) ((StringProperty) fieldSpec.getProperty()).set(selected.toString());
                     });
@@ -428,6 +449,13 @@ public class Main extends Application {
                 case BUTTON -> {
                     Button btn = new Button(label.getText());
                     btn.setOnAction(e -> handleButtonAction(fieldSpec.getLabel()));
+                    grid.add(btn, 1, row);
+                }
+                case RESET -> {
+                    Button btn = new Button(label.getText());
+                    btn.setOnAction(e -> showConfirmation(
+                            "Are you sure you want to restore all settings to their default values?"
+                            ));
                     grid.add(btn, 1, row);
                 }
                 default -> {}
@@ -665,6 +693,13 @@ public class Main extends Application {
         }
     }
 
+    private void handleResetAction (Stage dialog) {
+        assetPathsTabData.reset();
+        bingoCardsTabData.reset();
+        landscapeBingoCardsTabData.reset();
+        dialog.close();
+    }
+
     private void showError(String message) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -684,6 +719,149 @@ public class Main extends Application {
         Scene scene = new Scene(box);
         dialog.setScene(scene);
         dialog.showAndWait();
+    }
+
+    private void showConfirmation(String message) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("Confirm Reset");
+
+        VBox box = new VBox(10);
+        box.setPrefSize(500, 150);
+        box.setPadding(new Insets(15));
+        Label label = new Label(message);
+        label.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
+        HBox buttons = new HBox(10);
+        buttons.setAlignment(Pos.CENTER);
+        Button yes = new Button("Yes");
+        Button cancel = new Button("Cancel");
+        yes.setOnAction(e -> handleResetAction(dialog));
+        yes.setFocusTraversable(false);
+        cancel.setOnAction(e -> dialog.close());
+
+        buttons.getChildren().addAll(yes, cancel);
+        box.getChildren().addAll(label, buttons);
+        box.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(box);
+        dialog.setScene(scene);
+        dialog.showAndWait();
+    }
+
+    public void saveData() {
+        try {
+            ConfigData configData = new ConfigData(
+                    getAssetPathsMap(),
+                    getBingoCardsMap(bingoCardsTabData),
+                    getBingoCardsMap(landscapeBingoCardsTabData)
+            );
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File("config.json"), configData);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadData() {
+        File file = new File("config.json");
+        if (!file.exists()) return;
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ConfigData config = mapper.readValue(file, ConfigData.class);
+
+            config.assetPaths().forEach((k, v) -> {
+                switch (k) {
+                    case "theme" -> assetPathsTabData.getTheme().set(v);
+                    case "gridColor" -> assetPathsTabData.getGridColor().set(Color.web(v));
+                    case "fontColor" -> assetPathsTabData.getFontColor().set(Color.web(v));
+                    case "bingoIcons" -> assetPathsTabData.getBingoIcons().set(v);
+                    case "header" -> assetPathsTabData.getHeader().set(v);
+                    case "frame" -> assetPathsTabData.getFrame().set(v);
+                    case "freeSpace" -> assetPathsTabData.getFreeSpace().set(v);
+                    case "ccHeader" -> assetPathsTabData.getCcHeader().set(v);
+                    case "token" -> assetPathsTabData.getToken().set(v);
+                    case "output" -> assetPathsTabData.getOutput().set(v);
+                    case "instructions" -> assetPathsTabData.getInstructions().set(v);
+                    case "font" -> assetPathsTabData.getFont().set(v);
+                    case "scissors" -> assetPathsTabData.getScissors().set(v);
+                }
+            });
+
+            config.bingoCards().forEach((k, v) -> setBingoProperty(bingoCardsTabData, k, v));
+            config.landscapeBingoCards().forEach((k, v) -> setBingoProperty(landscapeBingoCardsTabData, k, v));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setBingoProperty(BingoCardsTabData data, String key, Double value) {
+        switch (key) {
+            case "headerSpacingTop" -> data.getHeaderSpacingTop().set(value);
+            case "headerSpacingRight" -> data.getHeaderSpacingRight().set(value);
+            case "headerSpacingBottom" -> data.getHeaderSpacingBottom().set(value);
+            case "headerSpacingLeft" -> data.getHeaderSpacingLeft().set(value);
+            case "gridLineThickness" -> data.getGridLineThickness().set(value);
+            case "gridSpacingRight" -> data.getGridSpacingRight().set(value);
+            case "gridSpacingBottom" -> data.getGridSpacingBottom().set(value);
+            case "gridSpacingLeft" -> data.getGridSpacingLeft().set(value);
+            case "labelSize" -> data.getLabelSize().set(value);
+            case "cellHorizontalSpacing" -> data.getCellHorizontalSpacing().set(value);
+            case "cellVerticalSpacing" -> data.getCellVerticalSpacing().set(value);
+            case "cellGap" -> data.getCellGap().set(value);
+            case "copies" -> data.getCopies().set(value.intValue());
+        }
+    }
+
+    public record ConfigData(
+            Map<String, String> assetPaths,
+            Map<String, Double> bingoCards,
+            Map<String, Double> landscapeBingoCards
+    ) {}
+
+    private Map<String, String> getAssetPathsMap() {
+        return Map.ofEntries(
+                Map.entry("theme", assetPathsTabData.getTheme().getValue()),
+                Map.entry("gridColor", colorToHex(assetPathsTabData.getGridColor().getValue())),
+                Map.entry("fontColor", colorToHex(assetPathsTabData.getFontColor().getValue())),
+                Map.entry("bingoIcons", assetPathsTabData.getBingoIcons().getValue()),
+                Map.entry("header", assetPathsTabData.getHeader().getValue()),
+                Map.entry("frame", assetPathsTabData.getFrame().getValue()),
+                Map.entry("freeSpace", assetPathsTabData.getFreeSpace().getValue()),
+                Map.entry("ccHeader", assetPathsTabData.getCcHeader().getValue()),
+                Map.entry("token", assetPathsTabData.getToken().getValue()),
+                Map.entry("output", assetPathsTabData.getOutput().getValue()),
+                Map.entry("instructions", assetPathsTabData.getInstructions().getValue()),
+                Map.entry("font", assetPathsTabData.getFont().getValue()),
+                Map.entry("scissors", assetPathsTabData.getScissors().getValue())
+        );
+    }
+
+    private Map<String, Double> getBingoCardsMap(BingoCardsTabData data) {
+        return Map.ofEntries(
+                Map.entry("headerSpacingTop", data.getHeaderSpacingTop().getValue()),
+                Map.entry("headerSpacingRight", data.getHeaderSpacingRight().getValue()),
+                Map.entry("headerSpacingBottom", data.getHeaderSpacingBottom().getValue()),
+                Map.entry("headerSpacingLeft", data.getHeaderSpacingLeft().getValue()),
+                Map.entry("gridLineThickness", data.getGridLineThickness().getValue()),
+                Map.entry("gridSpacingRight", data.getGridSpacingRight().getValue()),
+                Map.entry("gridSpacingBottom", data.getGridSpacingBottom().getValue()),
+                Map.entry("gridSpacingLeft", data.getGridSpacingLeft().getValue()),
+                Map.entry("labelSize", data.getLabelSize().getValue()),
+                Map.entry("cellHorizontalSpacing", data.getCellHorizontalSpacing().getValue()),
+                Map.entry("cellVerticalSpacing", data.getCellVerticalSpacing().getValue()),
+                Map.entry("cellGap", data.getCellGap().getValue()),
+                Map.entry("copies", (double) data.getCopies().getValue())
+        );
+    }
+
+    private String colorToHex(Color color) {
+        return String.format("#%02X%02X%02X",
+                (int)(color.getRed() * 255),
+                (int)(color.getGreen() * 255),
+                (int)(color.getBlue() * 255));
     }
 
     public static void main(String[] args) {

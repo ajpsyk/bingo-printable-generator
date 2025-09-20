@@ -19,6 +19,8 @@ dependencies {
     implementation(libs.itextKernel)
     implementation(libs.itextIO)
     implementation(libs.itextSVG)
+    implementation(libs.jackson)
+    implementation(libs.jacksonDatabind)
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
