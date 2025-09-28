@@ -1,9 +1,6 @@
 package org.bingo.ui;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.scene.paint.Color;
 import lombok.Getter;
 
@@ -22,6 +19,7 @@ public class AssetPathsTabData {
     private final StringProperty instructions = new SimpleStringProperty("");
     private final StringProperty font = new SimpleStringProperty("");
     private final StringProperty scissors = new SimpleStringProperty("");
+    private final BooleanProperty enableLabels = new SimpleBooleanProperty(true);
 
     public void reset() {
         theme.set("");
@@ -37,5 +35,6 @@ public class AssetPathsTabData {
         instructions.set("");
         font.set("");
         scissors.set("");
+        enableLabels.set(true);
     }
 }

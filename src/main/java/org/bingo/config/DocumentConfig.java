@@ -27,4 +27,6 @@ public class DocumentConfig {
     @Builder.Default float marginRightInches = 0f;
     @Builder.Default float marginBottomInches = 0f;
     @Builder.Default float marginLeftInches = 0f;
+
+    @Builder.Default boolean enableLabels = true;
 }

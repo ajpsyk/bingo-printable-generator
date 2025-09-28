@@ -13,7 +13,7 @@ public class AssetPathsFields {
                         new FieldSpec<>("Grid Color:", assetPathsTabData.getGridColor(), FieldType.COLOR),
                         new FieldSpec<>("Label Color:", assetPathsTabData.getFontColor(), FieldType.COLOR)
                 ),
-                List.of(new FieldSpec<>("Image Directory:", assetPathsTabData.getBingoIcons(), FieldType.DIRECTORY),
+                List.of(new FieldSpec<>("Grid Content Path:", assetPathsTabData.getBingoIcons(), FieldType.DIRECTORY),
                         new FieldSpec<>("Header Path:", assetPathsTabData.getHeader(), FieldType.FILE),
                         new FieldSpec<>("Frame Path:", assetPathsTabData.getFrame(), FieldType.FILE),
                         new FieldSpec<>("Free Space Path:", assetPathsTabData.getFreeSpace(), FieldType.FILE),
@@ -24,7 +24,8 @@ public class AssetPathsFields {
                 List.of(
                         new FieldSpec<>("Instructions Path:", assetPathsTabData.getInstructions(), FieldType.FILE),
                         new FieldSpec<>("Font Path:", assetPathsTabData.getFont(), FieldType.FILE),
-                        new FieldSpec<>("Scissors Icon Path:", assetPathsTabData.getScissors(), FieldType.FILE)
+                        new FieldSpec<>("Scissors Icon Path:", assetPathsTabData.getScissors(), FieldType.FILE),
+                        new FieldSpec<>("Enable Labels:", assetPathsTabData.getEnableLabels(), FieldType.CHECKBOX)
                 ),
                 List.of(
                         new FieldSpec<>("Generate C.C., Tokens, and Instructions", null, FieldType.BUTTON)

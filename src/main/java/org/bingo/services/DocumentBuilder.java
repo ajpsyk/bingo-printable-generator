@@ -57,10 +57,17 @@ public class DocumentBuilder {
                 addToDocument(canvas, grid.getObject(), grid.getTransform());
 
                 List<String> permutation = permutations.get(i);
-                ObjectBuilder.addImagesAndLabelsToGrid(
-                        pageConfig, grid, permutation, bingoSquares, freeSpace, canvas
-                );
+                if (docConfig.isEnableLabels()) {
+                    ObjectBuilder.addImagesAndLabelsToGrid(
+                            pageConfig, grid, permutation, bingoSquares, freeSpace, canvas
+                    );
+                } else {
+                    ObjectBuilder.addImagesToGrid(
+                            pageConfig, grid, permutation, bingoSquares, freeSpace, canvas
+                    );
+                }
             });
+
         } catch (IOException e) {
             throw new FileNotFoundException("Output path is invalid or not writable: " + outputPath);
         }
@@ -121,14 +128,25 @@ public class DocumentBuilder {
 
 
                 List<String> leftPermutation = permutations.get(i * 2);
-                ObjectBuilder.addImagesAndLabelsToGrid(
-                        pageConfig, grid, leftPermutation, bingoSquares, freeSpace, canvas
-                );
-
                 List<String> rightPermutation = permutations.get(i * 2 + 1);
-                ObjectBuilder.addImagesAndLabelsToGrid(
-                        pageConfig, offsetGrid, rightPermutation, bingoSquares, freeSpace, canvas
-                );
+
+                if (docConfig.isEnableLabels()) {
+                    ObjectBuilder.addImagesAndLabelsToGrid(
+                            pageConfig, grid, leftPermutation, bingoSquares, freeSpace, canvas
+                    );
+
+                    ObjectBuilder.addImagesAndLabelsToGrid(
+                            pageConfig, offsetGrid, rightPermutation, bingoSquares, freeSpace, canvas
+                    );
+                } else {
+                    ObjectBuilder.addImagesToGrid(
+                            pageConfig, grid, leftPermutation, bingoSquares, freeSpace, canvas
+                    );
+
+                    ObjectBuilder.addImagesToGrid(
+                            pageConfig, offsetGrid, rightPermutation, bingoSquares, freeSpace, canvas
+                    );
+                }
 
             });
         } catch (IOException e) {
@@ -163,7 +181,7 @@ public class DocumentBuilder {
 
             addToDocument(canvas, scissors.getObject(), scissors.getTransform());
             addToDocument(canvas, grid.getObject(), grid.getTransform());
-            ObjectBuilder.addTokensToGrid(tokenConfig, grid, token, canvas);
+            ObjectBuilder.addImageToGrid(tokenConfig, grid, token, canvas);
 
 
             // Calling Cards Single
@@ -182,7 +200,12 @@ public class DocumentBuilder {
 
             addToDocument(canvas2, callingCardsHeader.getObject(), callingCardsHeader.getTransform());
             addToDocument(canvas2, ccGrid.getObject(), ccGrid.getTransform());
-            ObjectBuilder.addImagesAndLabelsToGrid(ccConfig, ccGrid, labelsInOrder, ccSquares, null, canvas2);
+            if (docConfig.isEnableLabels()) {
+                ObjectBuilder.addImagesAndLabelsToGrid(ccConfig, ccGrid, labelsInOrder, ccSquares, null, canvas2);
+            } else {
+                ObjectBuilder.addImagesToGrid(ccConfig, ccGrid, labelsInOrder, ccSquares, null, canvas2);
+            }
+
 
             // Calling Cards Multi
             Grid multiGrid = ObjectBuilder.getGrid(
@@ -206,14 +229,26 @@ public class DocumentBuilder {
 
                 addToDocument(canvas3, scissors.getObject(), scissors.getTransform());
                 addToDocument(canvas3, multiGrid.getObject(), multiGrid.getTransform());
-                ObjectBuilder.addImagesAndLabelsToGrid(
-                        multiCallingCardsConfig,
-                        multiGrid,
-                        labelsInOrder.subList(start, end),
-                        multiSquares,
-                        null,
-                        canvas3
-                );
+                if (docConfig.isEnableLabels()) {
+                    ObjectBuilder.addImagesAndLabelsToGrid(
+                            multiCallingCardsConfig,
+                            multiGrid,
+                            labelsInOrder.subList(start, end),
+                            multiSquares,
+                            null,
+                            canvas3
+                    );
+                } else {
+                    ObjectBuilder.addImagesToGrid(
+                            multiCallingCardsConfig,
+                            multiGrid,
+                            labelsInOrder.subList(start, end),
+                            multiSquares,
+                            null,
+                            canvas3
+                    );
+                }
+
             });
 
             if (remaining > 0) {
@@ -224,14 +259,26 @@ public class DocumentBuilder {
 
                 addToDocument(canvas4, scissors.getObject(), scissors.getTransform());
                 addToDocument(canvas4, lastGrid.getObject(), lastGrid.getTransform());
-                ObjectBuilder.addImagesAndLabelsToGrid(
-                        multiCallingLastCardsConfig,
-                        lastGrid,
-                        labelsInOrder.subList(start, totalIcons),
-                        multiSquares,
-                        null,
-                        canvas4
-                );
+                if (docConfig.isEnableLabels()) {
+                    ObjectBuilder.addImagesAndLabelsToGrid(
+                            multiCallingLastCardsConfig,
+                            lastGrid,
+                            labelsInOrder.subList(start, totalIcons),
+                            multiSquares,
+                            null,
+                            canvas4
+                    );
+                } else {
+                    ObjectBuilder.addImagesToGrid(
+                            multiCallingLastCardsConfig,
+                            lastGrid,
+                            labelsInOrder.subList(start, totalIcons),
+                            multiSquares,
+                            null,
+                            canvas4
+                    );
+                }
+
             }
         } catch (IOException e) {
             throw new FileNotFoundException("Output path is invalid or not writable: " + outputPath);

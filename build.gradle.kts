@@ -9,6 +9,7 @@
 plugins {
     application
     id("org.openjfx.javafxplugin") version "0.1.0"
+    id("org.beryx.runtime") version "1.13.1"
 }
 
 repositories {
@@ -47,7 +48,4 @@ java {
 
 application {
     mainClass = "org.bingo.ui.Main"
-    applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=javafx.graphics"
-    )
 }

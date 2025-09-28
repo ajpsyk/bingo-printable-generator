@@ -220,7 +220,7 @@ public class ObjectBuilder {
         }
     }
 
-    public static void addTokensToGrid(
+    public static void addImageToGrid(
             PageConfig config,
             Grid grid,
             PdfFormXObject token,
@@ -250,6 +250,65 @@ public class ObjectBuilder {
                         + (availableImageHeight - scaledImageHeight) / 2;
                 canvas.addXObjectWithTransformationMatrix(
                         token, imageScale, 0f, 0f, imageScale, imagePosX, imagePosY
+                );
+            }
+        }
+    }
+
+    public static void addImagesToGrid(
+            PageConfig config,
+            Grid grid,
+            List<String> permutation,
+            Map<String, GridContent> bingoSquares,
+            PdfFormXObject freeSpace,
+            PdfCanvas canvas
+    ) {
+        int rows = config.getGridRowAmount();
+        int cols = config.getGridColumnAmount();
+        float cellWidth = grid.getCellWidth();
+        float cellHeight = grid.getCellHeight();
+        float cellPaddingY = grid.getCellPaddingY();
+        float gridX = grid.getTransform().getPositionX();
+        float gridY = grid.getTransform().getPositionY();
+        float usableWidth = grid.getUsableWidth();
+
+        Iterator<String> permutationIterator = permutation.iterator();
+
+        for (int row = rows - 1; row >= 0; row--) {
+            for (int col = 0; col < cols; col++) {
+                if (freeSpace != null && row == rows / 2 && col == cols / 2) {
+                    float freeScaleX = cellWidth / freeSpace.getWidth();
+                    float freeScaleY = cellHeight / freeSpace.getHeight();
+                    float imageScale = Math.min(freeScaleX, freeScaleY);
+
+                    float scaledWidth  = freeSpace.getWidth() * imageScale;
+                    float scaledHeight = freeSpace.getHeight() * imageScale;
+
+                    float freePosX = gridX + col * cellWidth + (cellWidth - scaledWidth) / 2;
+                    float freePosY = gridY + row * cellHeight + (cellHeight - scaledHeight) / 2;
+
+                    canvas.addXObjectWithTransformationMatrix(
+                            freeSpace, imageScale, 0f, 0f, imageScale, freePosX, freePosY
+                    );
+                    continue;
+                }
+                String square = permutationIterator.next();
+                PdfFormXObject image = bingoSquares.get(square).getIcon();
+
+                float availableImageHeight = cellHeight - cellPaddingY;
+                float imageScaleX = usableWidth / image.getWidth();
+                float imageScaleY = availableImageHeight / image.getHeight();
+                float imageScale = Math.min(imageScaleX, imageScaleY);
+
+                float scaledImageWidth  = image.getWidth() * imageScale;
+                float scaledImageHeight = image.getHeight() * imageScale;
+
+                float imagePosX = gridX + col * cellWidth + (cellWidth - scaledImageWidth) / 2;
+                float imagePosY = gridY + row * cellHeight + cellPaddingY / 2
+                        + (availableImageHeight - scaledImageHeight) / 2;
+
+                canvas.addXObjectWithTransformationMatrix(
+                        image, imageScale, 0f, 0f, imageScale, imagePosX, imagePosY
                 );
             }
         }

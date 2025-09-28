@@ -5,19 +5,11 @@ import com.itextpdf.kernel.geom.PageSize;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.Property;
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -60,11 +52,11 @@ public class Main extends Application {
         BorderPane root = new BorderPane();
         TabPane tabPane = new TabPane();
 
-        Tab assetsPaths = new Tab("Assets & Paths");
-        assetsPaths.setClosable(false);
+        Tab assetsPathsTab = new Tab("Assets & Paths");
+        assetsPathsTab.setClosable(false);
 
-        Tab bingoCards = new Tab("Bingo Cards");
-        bingoCards.setClosable(false);
+        Tab bingoCardsTab = new Tab("Bingo Cards");
+        bingoCardsTab.setClosable(false);
 
         GridPane assetsGrid = new GridPane();
         GridPane bingoCardsGrid = new GridPane();
@@ -78,11 +70,11 @@ public class Main extends Application {
         List<List<FieldSpec<?>>> bingoCardsTabGroups = BingoCardsFields.bingoCardsGroups(bingoCardsTabData);
         List<List<FieldSpec<?>>> landscapeBingoCardsTabGroups = BingoCardsFields.landscapeBingoCardsGroups(landscapeBingoCardsTabData);
 
-        addContentToTab(assetsGrid, assetsPaths, assetsAndPathsTabGroups, 100, 0);
-        addContentToTab(bingoCardsGrid, bingoCards, bingoCardsTabGroups, 140, 0);
-        addContentToTab(bingoCardsGrid, bingoCards, landscapeBingoCardsTabGroups, 140, 1);
+        addContentToTab(assetsGrid, assetsPathsTab, assetsAndPathsTabGroups, 100, 0);
+        addContentToTab(bingoCardsGrid, bingoCardsTab, bingoCardsTabGroups, 140, 0);
+        addContentToTab(bingoCardsGrid, bingoCardsTab, landscapeBingoCardsTabGroups, 140, 1);
 
-        tabPane.getTabs().addAll(assetsPaths, bingoCards);
+        tabPane.getTabs().addAll(assetsPathsTab, bingoCardsTab);
 
         root.setCenter(tabPane);
 
@@ -173,6 +165,37 @@ public class Main extends Application {
                     });
                     grid.add(browse, 2, row);
                 }
+                case FILE_OR_DIRECTORY -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
+                    TextField pathField = new TextField();
+                    pathField.textProperty().bindBidirectional((StringProperty) fieldSpec.getProperty());
+                    grid.add(pathField, 1, row);
+
+                    Button file = new Button("File");
+                    Button directory = new Button("Directory");
+                    file.setOnAction(e -> {
+                        FileChooser chooser = new FileChooser();
+                        chooser.setTitle("Select " + fieldSpec.getLabel());
+                        File initialFile = new File(((StringProperty) fieldSpec.getProperty()).get());
+                        if (initialFile.exists()) {
+                            chooser.setInitialDirectory(initialFile.getParentFile());
+                        }
+                        File selected = chooser.showOpenDialog(grid.getScene().getWindow());
+                        if (selected != null) ((StringProperty) fieldSpec.getProperty()).set(selected.toString());
+                    });
+                    directory.setOnAction(e -> {
+                        DirectoryChooser chooser = new DirectoryChooser();
+                        chooser.setTitle("Select " + fieldSpec.getLabel());
+                        File initialDir = new File(((StringProperty) fieldSpec.getProperty()).get());
+                        if (initialDir.exists() && initialDir.isDirectory()) {
+                            chooser.setInitialDirectory(initialDir);
+                        }
+                        File selected = chooser.showDialog(grid.getScene().getWindow());
+                        if (selected != null) ((StringProperty) fieldSpec.getProperty()).set(selected.toString());
+                    });
+                    HBox hBox = new HBox(5, file, directory);
+                    grid.add(hBox, 2, row);
+                }
                 case DOUBLE -> {
                     grid.add(new Label(fieldSpec.getLabel()), 0, row);
                     TextField textField = new TextField();
@@ -208,6 +231,12 @@ public class Main extends Application {
                             "Are you sure you want to restore all settings to their default values?"
                             ));
                     grid.add(btn, 1, row);
+                }
+                case CHECKBOX -> {
+                    grid.add(new Label(fieldSpec.getLabel()), 0, row);
+                    CheckBox checkBox = new CheckBox();
+                    checkBox.selectedProperty().bindBidirectional((BooleanProperty) fieldSpec.getProperty());
+                    grid.add(checkBox, 1, row);
                 }
                 default -> {}
             }
@@ -311,6 +340,7 @@ public class Main extends Application {
                         .assets(paths)
                         .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
                         .fontColor(pdfFontColor)
+                        .enableLabels(assetPathsTabData.getEnableLabels().getValue())
                         .marginTopInches(0.25f)
                         .marginBottomInches(0.25f)
                         .marginLeftInches(0.25f)
@@ -347,6 +377,7 @@ public class Main extends Application {
                 DocumentConfig twoPerPageBingoCards = DocumentConfig.builder()
                         .assets(paths)
                         .fontColor(pdfFontColor)
+                        .enableLabels(assetPathsTabData.getEnableLabels().getValue())
                         .marginLeftInches(0.25f)
                         .marginRightInches(0.25f)
                         .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
@@ -385,6 +416,7 @@ public class Main extends Application {
                 DocumentConfig instructionsTokensCallingCards = DocumentConfig.builder()
                         .assets(paths)
                         .fontColor(pdfFontColor)
+                        .enableLabels(assetPathsTabData.getEnableLabels().getValue())
                         .marginTopInches(0.25f)
                         .marginBottomInches(0.25f)
                         .marginLeftInches(0.25f)
@@ -393,7 +425,7 @@ public class Main extends Application {
                         .build();
 
                 PageConfig tokens = PageConfig.builder()
-                        .gridLineThicknessInches(bingoCardsTabData.getGridLineThickness().getValue().floatValue())
+                        .gridLineThicknessInches(0.007f)
                         .cellSpacingYRatio(bingoCardsTabData.getCellVerticalSpacing().getValue().floatValue())
                         .gridLineColor(new DeviceRgb(115, 115, 115))
                         .gridRowAmount(9)
@@ -536,6 +568,7 @@ public class Main extends Application {
                     case "instructions" -> assetPathsTabData.getInstructions().set(v);
                     case "font" -> assetPathsTabData.getFont().set(v);
                     case "scissors" -> assetPathsTabData.getScissors().set(v);
+                    case "enableLabels" -> assetPathsTabData.getEnableLabels().set(Boolean.parseBoolean(v));
                 }
             });
 
@@ -585,7 +618,8 @@ public class Main extends Application {
                 Map.entry("output", assetPathsTabData.getOutput().getValue()),
                 Map.entry("instructions", assetPathsTabData.getInstructions().getValue()),
                 Map.entry("font", assetPathsTabData.getFont().getValue()),
-                Map.entry("scissors", assetPathsTabData.getScissors().getValue())
+                Map.entry("scissors", assetPathsTabData.getScissors().getValue()),
+                Map.entry("enableLabels", String.valueOf(assetPathsTabData.getEnableLabels().getValue()))
         );
     }
 
@@ -613,7 +647,19 @@ public class Main extends Application {
                 (int)(color.getGreen() * 255),
                 (int)(color.getBlue() * 255));
     }
-
+/*
+    private boolean validateFields(List<List<FieldSpec<?>>> groups) {
+        for (var group : groups) {
+            for (var spec : group) {
+                if (!spec.isValid()) {
+                    showError(spec.getLabel().replace(":", "") + " is invalid or missing.");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+*/
     public static void main(String[] args) {
         launch(args);
     }
