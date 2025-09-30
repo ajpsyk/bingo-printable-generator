@@ -145,8 +145,6 @@ public class ObjectBuilder {
                 .labelHeight(cellHeight * config.getLabelHeightRatio())
                 .usableWidth(cellWidth - cellPaddingX)
                 .build();
-
-
     }
 
 
@@ -271,31 +269,36 @@ public class ObjectBuilder {
         float gridX = grid.getTransform().getPositionX();
         float gridY = grid.getTransform().getPositionY();
         float usableWidth = grid.getUsableWidth();
+        float availableImageHeight = cellHeight - cellPaddingY;
+
+        if (freeSpace != null) {
+
+            float freeScaleX = usableWidth / freeSpace.getWidth();
+            float freeScaleY = availableImageHeight / freeSpace.getHeight();
+            float imageScale = Math.min(freeScaleX, freeScaleY);
+
+            float scaledWidth  = freeSpace.getWidth() * imageScale;
+            float scaledHeight = freeSpace.getHeight() * imageScale;
+
+            float freePosX = gridX + cols / 2 * cellWidth + (cellWidth - scaledWidth) / 2;
+            float freePosY = gridY + rows / 2 * cellHeight + (cellHeight - scaledHeight) / 2;
+
+            canvas.addXObjectWithTransformationMatrix(
+                    freeSpace, imageScale, 0f, 0f, imageScale, freePosX, freePosY
+            );
+        }
 
         Iterator<String> permutationIterator = permutation.iterator();
 
         for (int row = rows - 1; row >= 0; row--) {
             for (int col = 0; col < cols; col++) {
                 if (freeSpace != null && row == rows / 2 && col == cols / 2) {
-                    float freeScaleX = cellWidth / freeSpace.getWidth();
-                    float freeScaleY = cellHeight / freeSpace.getHeight();
-                    float imageScale = Math.min(freeScaleX, freeScaleY);
-
-                    float scaledWidth  = freeSpace.getWidth() * imageScale;
-                    float scaledHeight = freeSpace.getHeight() * imageScale;
-
-                    float freePosX = gridX + col * cellWidth + (cellWidth - scaledWidth) / 2;
-                    float freePosY = gridY + row * cellHeight + (cellHeight - scaledHeight) / 2;
-
-                    canvas.addXObjectWithTransformationMatrix(
-                            freeSpace, imageScale, 0f, 0f, imageScale, freePosX, freePosY
-                    );
                     continue;
                 }
+
                 String square = permutationIterator.next();
                 PdfFormXObject image = bingoSquares.get(square).getIcon();
 
-                float availableImageHeight = cellHeight - cellPaddingY;
                 float imageScaleX = usableWidth / image.getWidth();
                 float imageScaleY = availableImageHeight / image.getHeight();
                 float imageScale = Math.min(imageScaleX, imageScaleY);
