@@ -11,6 +11,6 @@ import lombok.NonNull;
 @Data
 @Builder(toBuilder = true)
 public class Frame {
-    @NonNull PdfFormXObject object;
+    PdfFormXObject object;
     @Builder.Default Transform transform = Transform.builder().build();
 }

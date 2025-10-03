@@ -43,6 +43,7 @@ public class Main extends Application {
     private final AssetPathsTabData assetPathsTabData = new AssetPathsTabData();
     private final BingoCardsTabData bingoCardsTabData = new BingoCardsTabData();
     private final BingoCardsTabData landscapeBingoCardsTabData = new BingoCardsTabData();
+    private final EmojiGameTabData emojiGameTabData = new EmojiGameTabData();
 
     @Override
     public void start(Stage primaryStage) {
@@ -58,8 +59,12 @@ public class Main extends Application {
         Tab bingoCardsTab = new Tab("Bingo Cards");
         bingoCardsTab.setClosable(false);
 
+        Tab emojiGameTab = new Tab("Emoji Game");
+        emojiGameTab.setClosable(false);
+
         GridPane assetsGrid = new GridPane();
         GridPane bingoCardsGrid = new GridPane();
+        GridPane emojiGameGrid = new GridPane();
 
         ColumnConstraints outerConstraint = new ColumnConstraints();
         outerConstraint.setMinWidth(200);
@@ -69,12 +74,14 @@ public class Main extends Application {
         List<List<FieldSpec<?>>> assetsAndPathsTabGroups = AssetPathsFields.assetPathsGroups(assetPathsTabData);
         List<List<FieldSpec<?>>> bingoCardsTabGroups = BingoCardsFields.bingoCardsGroups(bingoCardsTabData);
         List<List<FieldSpec<?>>> landscapeBingoCardsTabGroups = BingoCardsFields.landscapeBingoCardsGroups(landscapeBingoCardsTabData);
+        List<List<FieldSpec<?>>> emojiGameTabGroups = EmojiGameFields.emojiGameGroups(emojiGameTabData);
 
         addContentToTab(assetsGrid, assetsPathsTab, assetsAndPathsTabGroups, 100, 0);
         addContentToTab(bingoCardsGrid, bingoCardsTab, bingoCardsTabGroups, 140, 0);
         addContentToTab(bingoCardsGrid, bingoCardsTab, landscapeBingoCardsTabGroups, 140, 1);
+        addContentToTab(emojiGameGrid, emojiGameTab, emojiGameTabGroups, 120, 0);
 
-        tabPane.getTabs().addAll(assetsPathsTab, bingoCardsTab);
+        tabPane.getTabs().addAll(assetsPathsTab, bingoCardsTab, emojiGameTab);
 
         root.setCenter(tabPane);
 
@@ -246,68 +253,8 @@ public class Main extends Application {
     }
 
     public void handleButtonAction(String label) {
-        if (assetPathsTabData.getTheme().getValue() == null || assetPathsTabData.getTheme().getValue().isBlank()) {
-            showError("Theme Name is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getBingoIcons().getValue() == null || assetPathsTabData.getBingoIcons().getValue().isBlank()) {
-            showError("Image Directory is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getHeader().getValue() == null || assetPathsTabData.getHeader().getValue().isBlank()) {
-            showError("Header Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getFrame().getValue() == null || assetPathsTabData.getFrame().getValue().isBlank()) {
-            showError("Frame Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getFreeSpace().getValue() == null || assetPathsTabData.getFreeSpace().getValue().isBlank()) {
-            showError("Free Space Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getCcHeader().getValue() == null || assetPathsTabData.getCcHeader().getValue().isBlank()) {
-            showError("C.C. Header Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getToken().getValue() == null || assetPathsTabData.getToken().getValue().isBlank()) {
-            showError("Token Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getOutput().getValue() == null || assetPathsTabData.getOutput().getValue().isBlank()) {
-            showError("Output Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getInstructions().getValue() == null || assetPathsTabData.getInstructions().getValue().isBlank()) {
-            showError("Instructions Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getFont().getValue() == null || assetPathsTabData.getFont().getValue().isBlank()) {
-            showError("Font Path is required.");
-            return;
-        }
-
-        if (assetPathsTabData.getScissors().getValue() == null || assetPathsTabData.getScissors().getValue().isBlank()) {
-            showError("Scissors Path is required.");
-            return;
-        }
-        String THEME_NAME = assetPathsTabData.getTheme().getValue();
+        String themeName = assetPathsTabData.getTheme().getValue();
         Path output = Paths.get(assetPathsTabData.getOutput().getValue());
-        Path ONE_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_1PerPage_" + bingoCardsTabData.getCopies().getValue() + "Set.pdf");
-        Path TWO_PER_PAGE_OUTPUT_FILE = output.resolve(THEME_NAME + "_2PerPage_" + landscapeBingoCardsTabData.getCopies().getValue() + "Set.pdf");
-        Path CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE = output.resolve(
-                THEME_NAME + "_Calling Cards_Tokens_Rules.pdf"
-        );
-
 
         AssetPaths paths = AssetPaths.builder()
                 .framePath(Paths.get(assetPathsTabData.getFrame().getValue()))
@@ -336,11 +283,14 @@ public class Main extends Application {
 
         switch (label) {
             case "Generate 1 Per Page" -> {
+                int onePerPageCopies = bingoCardsTabData.getCopies().getValue();
+                String onePerPageOutput = themeName + "_1PerPage_" + onePerPageCopies;
                 DocumentConfig onePerPageBingoCards = DocumentConfig.builder()
                         .assets(paths)
-                        .outputPath(ONE_PER_PAGE_OUTPUT_FILE)
+                        .outputPath(output.resolve(onePerPageOutput))
                         .fontColor(pdfFontColor)
                         .enableLabels(assetPathsTabData.getEnableLabels().getValue())
+                        .pageSize(PageSize.LETTER)
                         .marginTopInches(0.25f)
                         .marginBottomInches(0.25f)
                         .marginLeftInches(0.25f)
@@ -374,13 +324,15 @@ public class Main extends Application {
 
             }
             case "Generate 2 Per Page" -> {
+                int twoPerPageCopies = bingoCardsTabData.getCopies().getValue();
+                String twoPerPageOutput = themeName + "_2PerPage_" + twoPerPageCopies;
                 DocumentConfig twoPerPageBingoCards = DocumentConfig.builder()
                         .assets(paths)
                         .fontColor(pdfFontColor)
                         .enableLabels(assetPathsTabData.getEnableLabels().getValue())
                         .marginLeftInches(0.25f)
                         .marginRightInches(0.25f)
-                        .outputPath(TWO_PER_PAGE_OUTPUT_FILE)
+                        .outputPath(output.resolve(twoPerPageOutput))
                         .pageSize(PageSize.LETTER.rotate())
                         .marginTopInches(0.625f)
                         .marginBottomInches(0.625f)
@@ -421,7 +373,7 @@ public class Main extends Application {
                         .marginBottomInches(0.25f)
                         .marginLeftInches(0.25f)
                         .marginRightInches(0.25f)
-                        .outputPath(CALLING_CARDS_TOKENS_RULES_OUTPUT_FILE)
+                        .outputPath(output.resolve(themeName + "_Calling Cards_Tokens_Rules.pdf"))
                         .build();
 
                 PageConfig tokens = PageConfig.builder()
@@ -471,7 +423,53 @@ public class Main extends Application {
                     e.printStackTrace();
                 }
             }
+            case "Generate Emoji Game" -> {
+                AssetPaths emojiGamePaths = AssetPaths.builder()
+                        .framePath(Paths.get(emojiGameTabData.getFrame().getValue()))
+                        .headerPath(Paths.get(emojiGameTabData.getEmojiGame().getValue()))
+                        .callingCardsHeaderPath(Paths.get(emojiGameTabData.getAnswerKey().getValue()))
+                        .build();
 
+                DocumentConfig documentConfig = DocumentConfig.builder()
+                        .assets(emojiGamePaths)
+                        .outputPath(output.resolve(emojiGameTabData.getTheme().getValue() + ".pdf"))
+                        .marginTopInches(0.25f)
+                        .marginBottomInches(0.25f)
+                        .marginLeftInches(0.25f)
+                        .marginRightInches(0.25f)
+                        .build();
+
+                DocumentConfig twoPerPageDocConfig = DocumentConfig.builder()
+                        .assets(emojiGamePaths)
+                        .outputPath(output.resolve(emojiGameTabData.getTheme().getValue() + "_2PerPage_" + ".pdf"))
+                        .pageSize(PageSize.LETTER.rotate())
+                        .marginTopInches(0.8f)
+                        .marginBottomInches(0.8f)
+                        .marginLeftInches(0.2f)
+                        .marginRightInches(0.2f)
+                        .build();
+
+                PageConfig pageConfig = PageConfig.builder()
+                        .headerSpacingTopInches(emojiGameTabData.getSpacingTop().getValue().floatValue())
+                        .headerSpacingBottomInches(emojiGameTabData.getSpacingBottom().getValue().floatValue())
+                        .headerSpacingLeftInches(emojiGameTabData.getSpacingLeft().getValue().floatValue())
+                        .headerSpacingRightInches(emojiGameTabData.getSpacingRight().getValue().floatValue())
+                        .build();
+
+                PageConfig twoPerPagePageConfig = PageConfig.builder()
+                        .headerSpacingTopInches(emojiGameTabData.getTwoPPSpacingTop().getValue().floatValue())
+                        .headerSpacingBottomInches(emojiGameTabData.getTwoPPSpacingBottom().getValue().floatValue())
+                        .headerSpacingLeftInches(emojiGameTabData.getTwoPPSpacingLeft().getValue().floatValue())
+                        .headerSpacingRightInches(emojiGameTabData.getTwoPPSpacingRight().getValue().floatValue())
+                        .copies(2)
+                        .build();
+
+                try {
+                    DocumentBuilder.buildEmojiGame(documentConfig, pageConfig, twoPerPageDocConfig, twoPerPagePageConfig);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -647,19 +645,7 @@ public class Main extends Application {
                 (int)(color.getGreen() * 255),
                 (int)(color.getBlue() * 255));
     }
-/*
-    private boolean validateFields(List<List<FieldSpec<?>>> groups) {
-        for (var group : groups) {
-            for (var spec : group) {
-                if (!spec.isValid()) {
-                    showError(spec.getLabel().replace(":", "") + " is invalid or missing.");
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-*/
+
     public static void main(String[] args) {
         launch(args);
     }

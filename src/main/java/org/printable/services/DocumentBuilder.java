@@ -52,7 +52,7 @@ public class DocumentBuilder {
                 PdfPage page = doc.addNewPage(docConfig.getPageSize());
                 PdfCanvas canvas = new PdfCanvas(page);
 
-                addToDocument(canvas, frame.getObject(), frame.getTransform());
+                if (frame != null) addToDocument(canvas, frame.getObject(), frame.getTransform());
                 addToDocument(canvas, header.getObject(), header.getTransform());
                 addToDocument(canvas, grid.getObject(), grid.getTransform());
 
@@ -280,6 +280,59 @@ public class DocumentBuilder {
                 }
 
             }
+        } catch (IOException e) {
+            throw new FileNotFoundException("Output path is invalid or not writable: " + outputPath);
+        }
+    }
+
+    public static void buildEmojiGame (
+            DocumentConfig docConfig, PageConfig pageConfig,
+            DocumentConfig twoDocConfig, PageConfig twoPageConfig) throws IOException {
+
+        String outputPath = docConfig.getOutputPath().toString();
+
+        try (PdfDocument doc = new PdfDocument(new PdfWriter(outputPath))) {
+            PageLayout pl = getPageDimensions(docConfig);
+            PageLayout twoPl = getPageDimensions(twoDocConfig);
+            AssetPaths assets = docConfig.getAssets();
+            float xOffset = twoPl.getMarginLeft() + twoPl.getMarginRight() + twoPl.getPrintSafeWidth();
+
+
+            Frame frame = ObjectBuilder.getFrame(doc, pl, assets.getFramePath());
+            Frame twoFrame = ObjectBuilder.getFrame(doc, twoPl, assets.getFramePath());
+            Frame offsetFrame = twoFrame.toBuilder()
+                    .transform(twoFrame.getTransform().toBuilder()
+                            .positionX(twoFrame.getTransform().getPositionX() + xOffset)
+                            .build())
+                    .build();
+            Header emojiGame = ObjectBuilder.getHeader(doc, pl, assets.getHeaderPath(), pageConfig);
+            Header twoEmojiGame = ObjectBuilder.getHeader(doc, twoPl, assets.getHeaderPath(), twoPageConfig);
+            Header offSetEmojiGame = twoEmojiGame.toBuilder()
+                    .transform(twoEmojiGame.getTransform().toBuilder()
+                            .positionX(twoEmojiGame.getTransform().getPositionX() + xOffset)
+                            .build())
+                    .build();
+            Header answerKey = ObjectBuilder.getHeader(doc, pl, assets.getCallingCardsHeaderPath(), pageConfig);
+
+            PdfPage page = doc.addNewPage(docConfig.getPageSize());
+            PdfCanvas canvas = new PdfCanvas(page);
+            addToDocument(canvas, frame.getObject(), frame.getTransform());
+            addToDocument(canvas, emojiGame.getObject(), emojiGame.getTransform());
+
+            PdfPage twoPerPage = doc.addNewPage(docConfig.getPageSize().rotate());
+            PdfCanvas twoPerPageCanvas = new PdfCanvas(twoPerPage);
+            addToDocument(twoPerPageCanvas, twoFrame.getObject(), twoFrame.getTransform());
+            addToDocument(twoPerPageCanvas, offsetFrame.getObject(), offsetFrame.getTransform());
+
+            addToDocument(twoPerPageCanvas, twoEmojiGame.getObject(), twoEmojiGame.getTransform());
+            addToDocument(twoPerPageCanvas, offSetEmojiGame.getObject(), offSetEmojiGame.getTransform());
+
+            PdfPage answerKeyPage = doc.addNewPage(docConfig.getPageSize());
+            PdfCanvas answerKeyCanvas = new PdfCanvas(answerKeyPage);
+            addToDocument(answerKeyCanvas, frame.getObject(), frame.getTransform());
+            addToDocument(answerKeyCanvas, answerKey.getObject(), answerKey.getTransform());
+
+
         } catch (IOException e) {
             throw new FileNotFoundException("Output path is invalid or not writable: " + outputPath);
         }

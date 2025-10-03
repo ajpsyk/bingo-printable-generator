@@ -28,7 +28,9 @@ public class ObjectBuilder {
     public static Frame getFrame(
             PdfDocument doc, PageLayout pl, Path framePath
     ) throws FileNotFoundException {
-
+        if (framePath.toString().isEmpty()) {
+            return null;
+        }
         PdfFormXObject frame = loadImage(framePath, doc);
 
         float frameWidthScaleFactor = pl.getPrintSafeWidth() / frame.getWidth();
