@@ -1,4 +1,4 @@
-package org.bingo.config;
+package org.printable.config;
 
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;

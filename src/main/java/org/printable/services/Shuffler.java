@@ -1,4 +1,4 @@
-package org.bingo.services;
+package org.printable.services;
 
 import java.util.List;
 import java.util.Set;

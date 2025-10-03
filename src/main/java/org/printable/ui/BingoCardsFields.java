@@ -1,4 +1,4 @@
-package org.bingo.ui;
+package org.printable.ui;
 
 import java.util.List;
 

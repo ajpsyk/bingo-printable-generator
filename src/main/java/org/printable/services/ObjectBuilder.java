@@ -1,4 +1,4 @@
-package org.bingo.services;
+package org.printable.services;
 
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -10,8 +10,8 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 
-import org.bingo.config.PageConfig;
-import org.bingo.model.*;
+import org.printable.config.PageConfig;
+import org.printable.model.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

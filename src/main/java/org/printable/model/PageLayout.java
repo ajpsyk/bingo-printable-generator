@@ -1,4 +1,4 @@
-package org.bingo.model;
+package org.printable.model;
 
 
 import lombok.Builder;

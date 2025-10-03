@@ -1,4 +1,4 @@
-package org.bingo.model;
+package org.printable.model;
 
 import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
 import lombok.Builder;

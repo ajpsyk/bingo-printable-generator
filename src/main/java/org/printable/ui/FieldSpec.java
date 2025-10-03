@@ -1,10 +1,8 @@
-package org.bingo.ui;
+package org.printable.ui;
 
 import javafx.beans.property.Property;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.function.Predicate;
 
 @AllArgsConstructor
 @Getter

@@ -1,4 +1,4 @@
-package org.bingo.ui;
+package org.printable.ui;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;

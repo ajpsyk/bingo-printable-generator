@@ -1,4 +1,4 @@
-package org.bingo.services;
+package org.printable.services;
 
 /**
  * Helper methods for converting measurements to PDF standards

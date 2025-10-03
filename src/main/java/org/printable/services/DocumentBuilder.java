@@ -1,4 +1,4 @@
-package org.bingo.services;
+package org.printable.services;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
@@ -17,10 +17,10 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.IntStream;
 
-import org.bingo.config.AssetPaths;
-import org.bingo.config.DocumentConfig;
-import org.bingo.config.PageConfig;
-import org.bingo.model.*;
+import org.printable.config.AssetPaths;
+import org.printable.config.DocumentConfig;
+import org.printable.config.PageConfig;
+import org.printable.model.*;
 
 public class DocumentBuilder {
 

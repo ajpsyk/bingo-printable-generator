@@ -1,4 +1,4 @@
-package org.bingo.ui;
+package org.printable.ui;
 
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
@@ -25,10 +25,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 
-import org.bingo.config.AssetPaths;
-import org.bingo.config.DocumentConfig;
-import org.bingo.config.PageConfig;
-import org.bingo.services.DocumentBuilder;
+import org.printable.config.AssetPaths;
+import org.printable.config.DocumentConfig;
+import org.printable.config.PageConfig;
+import org.printable.services.DocumentBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;

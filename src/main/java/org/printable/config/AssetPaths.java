@@ -1,4 +1,4 @@
-package org.bingo.config;
+package org.printable.config;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package org.bingo.ui;
+package org.printable.ui;
 
 enum FieldType {
     TEXT, COLOR, FILE, DIRECTORY, DOUBLE, INTEGER, HEADER, BUTTON, RESET, CHECKBOX, FILE_OR_DIRECTORY
