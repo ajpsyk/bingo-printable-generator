@@ -1,2 +1,2 @@
 # bingo-printable-generator
-A Java-based bingo game PDF generator for printable Etsy products.
+A Java-based PDF generator for printable products.
